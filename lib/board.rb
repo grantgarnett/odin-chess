@@ -14,10 +14,10 @@ class Board
   def generate_board
     @board = [generate_back_row("b"),
               generate_pawns("b"),
-              [nil, nil, nil, nil, nil, nil, nil, nil],
-              [nil, nil, nil, nil, nil, nil, nil, nil],
-              [nil, nil, nil, nil, nil, nil, nil, nil],
-              [nil, nil, nil, nil, nil, nil, nil, nil],
+              %w[x x x x x x x x],
+              %w[x x x x x x x x],
+              %w[x x x x x x x x],
+              %w[x x x x x x x x],
               generate_pawns("w"),
               generate_back_row("w")]
   end
@@ -39,7 +39,7 @@ class Board
   def generate_white_piece_arr
     @board.map do |row|
       row.select do |el|
-        el.color == "w" unless el.nil?
+        el.color == "w" unless el == "x"
       end
     end.flatten.compact
   end
@@ -47,7 +47,7 @@ class Board
   def generate_black_piece_arr
     @board.map do |row|
       row.select do |el|
-        el.color == "b" unless el.nil?
+        el.color == "b" unless el == "x"
       end
     end.flatten.compact
   end

@@ -9,7 +9,7 @@ module InOut
       print_left_side_el(row_index)
 
       row.each do |spot|
-        print spot.nil? ? "x " : piece_to_print(spot.color, spot.type)
+        print spot == "x" ? "x " : piece_to_print(spot.color, spot.type)
       end
 
       print_right_side_el
