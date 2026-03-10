@@ -1,11 +1,8 @@
-require_relative "in_out"
 require_relative "piece"
 
 # This class is responsible for updating the state of the board
 # and answering questions about the board state
 class Board
-  include InOut
-
   attr_reader :board, :white_pieces, :black_pieces
 
   def initialize
