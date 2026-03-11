@@ -2,11 +2,13 @@
 # board, such as its type, color, and information pertaining to special rules
 # (such as castling)
 class Piece
+  attr_accessor :position
   attr_reader :color, :type
 
-  def initialize(color, type)
+  def initialize(color, type, position)
     @color = color
     construct_piece(type)
+    @position = position
   end
 
   def construct_piece(type)

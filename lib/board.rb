@@ -25,15 +25,23 @@ class Board
   private
 
   def generate_pawns(color)
-    [Piece.new(color, "p"), Piece.new(color, "p"), Piece.new(color, "p"),
-     Piece.new(color, "p"), Piece.new(color, "p"), Piece.new(color, "p"),
-     Piece.new(color, "p"), Piece.new(color, "p")]
+    row = color == "w" ? 6 : 1
+    pawn_arr = []
+
+    8.times do |i|
+      pawn_arr << Piece.new(color, "p", [row, i])
+    end
+
+    pawn_arr
   end
 
   def generate_back_row(color)
-    [Piece.new(color, "R"), Piece.new(color, "N"), Piece.new(color, "B"),
-     Piece.new(color, "Q"), Piece.new(color, "K"), Piece.new(color, "B"),
-     Piece.new(color, "N"), Piece.new(color, "R")]
+    row = color == "w" ? 7 : 0
+
+    [Piece.new(color, "R", [row, 0]), Piece.new(color, "N", [row, 1]),
+     Piece.new(color, "B", [row, 2]), Piece.new(color, "Q", [row, 3]),
+     Piece.new(color, "K", [row, 4]), Piece.new(color, "B", [row, 5]),
+     Piece.new(color, "N", [row, 6]), Piece.new(color, "R", [row, 7])]
   end
 
   def generate_white_piece_arr
@@ -52,3 +60,5 @@ class Board
     end.flatten.compact
   end
 end
+
+Board.new
