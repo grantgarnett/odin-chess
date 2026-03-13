@@ -1,8 +1,11 @@
 require_relative "piece"
+require_relative "validate_moves"
 
 # This class is responsible for updating the state of the board
 # and answering questions about the board state
 class Board
+  include ValidateMoves
+
   attr_reader :board, :white_pieces, :black_pieces
 
   def initialize
@@ -60,5 +63,3 @@ class Board
     end.flatten.compact
   end
 end
-
-Board.new
