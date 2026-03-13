@@ -1,10 +1,6 @@
 require_relative "../lib/board"
 
 describe Board do
-  subject(:board_test) { described_class.new }
-
-  # i'm not very satisfied with these tests, since
-  # they're tied to the implementation
   context("when initialized") do
     it "puts black pieces on the top files" do
       random_black_pawn = board_test.board[1][3]
@@ -18,7 +14,7 @@ describe Board do
 
     it "puts empty pieces in the middle" do
       random_space = board_test.board[3][4]
-      expect(random_space).to be_nil
+      expect(random_space).to eq("x")
     end
   end
 end
