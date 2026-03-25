@@ -2,6 +2,8 @@ require_relative "../lib/board"
 
 describe Board do
   context("when initialized") do
+    subject(:board_test) { described_class.new }
+
     it "puts black pieces on the top files" do
       random_black_pawn = board_test.board[1][3]
       expect(random_black_pawn.color).to eq("b")

@@ -6,7 +6,7 @@ require_relative "validate_moves"
 class Board
   include ValidateMoves
 
-  attr_reader :board, :white_pieces, :black_pieces
+  attr_reader :board
 
   def initialize
     @board = generate_board

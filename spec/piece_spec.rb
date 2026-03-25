@@ -2,7 +2,7 @@ require_relative "../lib/piece"
 
 describe Piece do
   context("when creating a pawn") do
-    subject(:pawn_test) { described_class.new("w", "p") }
+    subject(:pawn_test) { described_class.new("w", "p", [0, 0]) }
 
     it "is a pawn" do
       type = pawn_test.type
@@ -25,7 +25,7 @@ describe Piece do
   end
 
   context("when creating a rook") do
-    subject(:rook_test) { described_class.new("b", "R") }
+    subject(:rook_test) { described_class.new("b", "R", [0, 0]) }
     it "is a rook" do
       type = rook_test.type
       expect(type).to eq("R")
@@ -41,7 +41,7 @@ describe Piece do
   end
 
   context("when creating a king") do
-    subject(:king_test) { described_class.new("b", "K") }
+    subject(:king_test) { described_class.new("b", "K", [0, 0]) }
     it "is a king" do
       type = king_test.type
       expect(type).to eq("K")
