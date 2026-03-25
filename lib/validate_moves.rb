@@ -1,5 +1,3 @@
-require "pry-byebug"
-
 # This class handles functionality for validating chess moves
 # Moves that involve taking are separated into their own
 # context, due to the use of algebraic notation in our
@@ -31,6 +29,14 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
     when "Q" then taking_queen_moves(piece.color, piece.position)
     when "N" then taking_knight_moves(piece.color, piece.position)
     when "K" then taking_king_moves(piece.color, piece.position)
+    end
+  end
+
+  def can_castle?(color, long_or_short)
+    if long_or_short == "0-0"
+      can_short_castle?(color)
+    elsif long_or_short == "0-0-0"
+      can_long_castle?(color)
     end
   end
 
@@ -291,5 +297,62 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
     protected_by_pawn(color, pieces)
       .union(protected_by_king(color, pieces))
       .union(protected_by_other(color, pieces))
+  end
+
+  def can_short_castle?(color)
+    if color == "w"
+      can_white_short_castle?
+    elsif color == "b"
+      can_black_short_castle?
+    end
+  end
+
+  def can_long_castle?(color)
+    if color == "w"
+      can_white_long_castle?
+    elsif color == "b"
+      can_black_long_castle?
+    end
+  end
+
+  def can_castle_at?(start_pos, type)
+    !spot_empty?(start_pos) && @board[start_pos[0]][start_pos[1]].type == type &&
+      @board[start_pos[0]][start_pos[1]].can_castle
+  end
+
+  def can_white_short_castle?
+    king_starting_pos = [7, 4]
+    rook_starting_pos = [7, 7]
+
+    can_castle_at?(king_starting_pos, "K") &&
+      can_castle_at?(rook_starting_pos, "R") &&
+      @board[7][5] == "x" && @board[7][6] == "x"
+  end
+
+  def can_black_short_castle?
+    king_starting_pos = [0, 4]
+    rook_starting_pos = [0, 7]
+
+    can_castle_at?(king_starting_pos, "K") &&
+      can_castle_at?(rook_starting_pos, "R") &&
+      @board[0][5] == "x" && @board[0][6] == "x"
+  end
+
+  def can_white_long_castle?
+    king_starting_pos = [7, 4]
+    rook_starting_pos = [7, 0]
+
+    can_castle_at?(king_starting_pos, "K") &&
+      can_castle_at?(rook_starting_pos, "R") &&
+      @board[7][1] == "x" && @board[7][2] == "x" && @board[7][3] == "x"
+  end
+
+  def can_black_long_castle?
+    king_starting_pos = [0, 4]
+    rook_starting_pos = [0, 0]
+
+    can_castle_at?(king_starting_pos, "K") &&
+      can_castle_at?(rook_starting_pos, "R") &&
+      @board[0][1] == "x" && @board[0][2] == "x" && @board[0][3] == "x"
   end
 end
