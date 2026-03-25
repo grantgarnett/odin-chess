@@ -6,7 +6,7 @@ require_relative "validate_moves"
 class Board
   include ValidateMoves
 
-  attr_reader :board
+  attr_reader :board, :white_pieces, :black_pieces
 
   def initialize
     @board = generate_board
@@ -23,6 +23,14 @@ class Board
               %w[x x x x x x x x],
               generate_pawns("w"),
               generate_back_row("w")]
+  end
+
+  def move_piece(piece, target)
+    if board[target[0]][target[1]] == "x"
+      non_taking_move(piece, target)
+    else
+      taking_move(piece, target)
+    end
   end
 
   private
@@ -61,5 +69,30 @@ class Board
         el.color == "b" unless el == "x"
       end
     end.flatten.compact
+  end
+
+  def non_taking_move(piece, target)
+    position_before = piece.position
+    piece.position = target
+
+    @board[target[0]][target[1]] = piece
+    @board[position_before[0]][position_before[1]] = "x"
+  end
+
+  def taking_move(piece, target)
+    taken_piece = @board[target[0]][target[1]]
+
+    position_before = piece.position
+    piece.position = target
+
+    @board[target[0]][target[1]] = piece
+    @board[position_before[0]][position_before[1]] = "x"
+
+    remove_from_team_arr(taken_piece)
+  end
+
+  def remove_from_team_arr(piece)
+    team_arr = piece.color == "w" ? @white_pieces : @black_pieces
+    team_arr.delete(piece)
   end
 end

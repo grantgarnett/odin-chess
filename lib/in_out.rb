@@ -1,5 +1,3 @@
-require "pry-byebug"
-
 # This module handles input / output for a game of chess
 # on the command line, such as prompting the user or
 # displaying the board.
