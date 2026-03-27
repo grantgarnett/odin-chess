@@ -2,8 +2,8 @@
 # board, such as its type, color, and information pertaining to special rules
 # (such as castling)
 class Piece
-  attr_accessor :position
-  attr_reader :color, :type
+  attr_accessor :position, :color
+  attr_reader :type
 
   def initialize(color, type, position)
     @color = color
