@@ -94,7 +94,9 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
   end
 
   def spot_empty?(pos)
-    @board[pos[0]].nil? || @board[pos[0]][pos[1]] == "x"
+    @board[pos[0]].nil? ||
+      @board[pos[0]][pos[1]].nil? ||
+      @board[pos[0]][pos[1]] == "x"
   end
 
   def can_move_from_pos_to?(pos, x_shift, y_shift)
@@ -161,7 +163,7 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
       move if can_take_at?(color, move)
     end
 
-    valid_moves.union(take_by_en_passant(color, pos)).compact
+    valid_moves.union(en_passant_moves(color, pos)).compact
   end
 
   def taking_rook_moves(color, pos)
@@ -199,7 +201,7 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
     moves.compact.difference(protected_pieces(opposite_color))
   end
 
-  def take_by_en_passant(color, position) # rubocop: disable Metrics/AbcSize
+  def en_passant_moves(color, position) # rubocop: disable Metrics/AbcSize
     up_or_down = color == "w" ? -1 : 1
 
     # don't have to search every val since a maximum
