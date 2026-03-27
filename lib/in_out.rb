@@ -36,8 +36,7 @@ module InOut
       move = gets.chomp
 
       move_as_arr = convert_from_algebraic(move)
-      print move_as_arr
-      break unless move_as_arr.nil?
+      return move_as_arr unless move_as_arr.nil?
 
       print "Invalid input. \n\n"
     end
@@ -56,6 +55,9 @@ module InOut
     elsif valid_move_target?(move[-2, 2])
       convert_non_castling_move(move)
     end
+  end
+
+  def invalid_input_message
   end
 
   private
