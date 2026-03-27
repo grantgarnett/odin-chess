@@ -20,7 +20,7 @@ describe Board do
   end
 
   context("#move_piece") do
-    context "when moving to an empty space" do
+    context "when moving a standard piece to an empty space" do
       # this functionality is separate from move validation, so this method
       # will simply move the piece
       let(:generic_piece) { double("generic piece", type: "?", color: "?", position: [6, 3]) }
@@ -52,7 +52,7 @@ describe Board do
       end
     end
 
-    context "when moving to an occupied space" do
+    context "when moving a standard piece to an occupied space" do
       let(:generic_black_piece) { double("generic piece", type: "?", color: "b", position: [2, 2]) }
       let(:generic_white_piece) { double("generic piece", type: "?", color: "w", position: [4, 4]) }
 
@@ -85,6 +85,105 @@ describe Board do
       it "removes the original piece from its corresponding team array" do
         piece_included = board_test.white_pieces.include?(generic_white_piece)
         expect(piece_included).to be false
+      end
+    end
+
+    context "when moving a pawn by two" do
+      let(:generic_white_pawn) { double("white pawn", type: "p", color: "w", position: [6, 2], move_by_two: true, can_en_passant: false) }
+
+      before do
+        allow(generic_white_pawn).to receive(:position=)
+        allow(generic_white_pawn).to receive(:move_by_two=)
+        allow(generic_white_pawn).to receive(:can_en_passant=)
+        board_test.instance_variable_set(:@board,
+                                         [%w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          ["x", "x", generic_white_pawn, "x", "x", "x", "x", "x"],
+                                          %w[x x x x x x x x]])
+        board_test.move_piece(generic_white_pawn, [4, 2])
+      end
+
+      it "changes the value to false" do
+        expect(generic_white_pawn).to have_received(:move_by_two=).with(false)
+      end
+
+      it "changes the value of can_en_passant to true" do
+        expect(generic_white_pawn).to have_received(:can_en_passant=).with(true)
+      end
+    end
+
+    context "when moving a king with can_castle set to true" do
+      let(:black_king) { double("black king", type: "K", color: "b", position: [0, 4], can_castle: true) }
+
+      before do
+        allow(black_king).to receive(:position=)
+        allow(black_king).to receive(:can_castle=)
+        board_test.instance_variable_set(:@board,
+                                         [["x", "x", "x", "x", black_king, "x", "x", "x"],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x]])
+        board_test.move_piece(black_king, [0, 5])
+      end
+
+      it "changes the value to false" do
+        expect(black_king).to have_received(:can_castle=).with(false)
+      end
+    end
+
+    context "when moving a rook with can_castle set to true" do
+      let(:generic_white_rook) { double("white rook", type: "R", color: "w", position: [0, 7], can_castle: true) }
+
+      before do
+        allow(generic_white_rook).to receive(:position=)
+        allow(generic_white_rook).to receive(:can_castle=)
+        board_test.instance_variable_set(:@board,
+                                         [["x", "x", "x", "x", "x", "x", "x", generic_white_rook],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x]])
+        board_test.move_piece(generic_white_rook, [0, 0])
+      end
+
+      it "changes the value to false" do
+        expect(generic_white_rook).to have_received(:can_castle=).with(false)
+      end
+    end
+
+    context "when moving any piece, and one of your pawns has can_en_passant set to true" do
+      let(:white_pawn) { double("white pawn", type: "p", color: "w", position: [6, 2], can_en_passant: true) }
+      let(:generic_white_piece) { double("white piece", type: "?", color: "w", position: [0, 0]) }
+
+      before do
+        allow(generic_white_piece).to receive(:position=)
+        allow(white_pawn).to receive(:can_en_passant=)
+        board_test.instance_variable_set(:@white_pieces, [generic_white_piece, white_pawn])
+        board_test.instance_variable_set(:@board,
+                                         [[generic_white_piece, "x", "x", "x", "x", "x", "x", "x"],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          ["x", "x", white_pawn, "x", "x", "x", "x", "x"],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x]])
+        board_test.move_piece(generic_white_piece, [3, 3])
+      end
+
+      it "changes the value to false" do
+        expect(white_pawn).to have_received(:can_en_passant=).with(false)
       end
     end
   end
