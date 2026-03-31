@@ -40,6 +40,15 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
     end
   end
 
+  def non_taking_rec(pos, x_shift, y_shift)
+    return [] unless can_move_without_taking_at?(pos)
+
+    next_move = non_taking_rec([pos[0] + x_shift, pos[1] + y_shift],
+                               x_shift, y_shift)
+
+    next_move.empty? ? [pos] : next_move.push(pos)
+  end
+
   private
 
   def non_taking_pawn_moves(color, pos, can_move_by_two)
@@ -88,9 +97,9 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
     end
   end
 
-  def can_move_without_taking_at?(pos)
-    pos[0] >= 0 && pos[1] >= 0 &&
-      !@board[pos[0]].nil? && @board[pos[0]][pos[1]] == "x"
+  def can_move_without_taking_at?(move)
+    move[0].between?(0, 7) && move[1].between?(0, 7) &&
+      @board[move[0]][move[1]] == "x"
   end
 
   def spot_empty?(pos)
@@ -104,15 +113,6 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
     y = pos[1]
 
     can_move_without_taking_at?([x + x_shift, y + y_shift])
-  end
-
-  def non_taking_rec(pos, x_shift, y_shift)
-    return [] unless can_move_without_taking_at?(pos)
-
-    next_move = non_taking_rec([pos[0] + x_shift, pos[1] + y_shift],
-                               x_shift, y_shift)
-
-    next_move.empty? ? [pos] : next_move.push(pos)
   end
 
   def non_taking_up_and_down(pos)
@@ -136,34 +136,50 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
   end
 
   def invalid_non_taking_king_moves(color)
-    enemy_pieces = color == "w" ? @black_pieces : @white_pieces
+    enemy_color = color == "w" ? "b" : "w"
 
-    invalid_moves = enemy_pieces.map do |piece|
-      non_taking_moves(piece) unless piece.type == "K"
-    end
+    enemy_standard_moves = invalid_king_moves_from_standard_pieces(color)
 
-    # do not want to get caught in a recursive function call
-    enemy_king_pos = find_king(enemy_pieces).position
-    enemy_king_moves = KING_MOVES.map do |move_dir|
-      [enemy_king_pos[0] + move_dir[0], enemy_king_pos[1] + move_dir[1]]
-    end
+    # must calculate enemy king moves separately to prevent infinite recursion
+    enemy_king_moves = invalid_king_moves_from_enemy_king(enemy_color)
 
-    invalid_moves.push(enemy_king_moves).uniq
+    enemy_standard_moves.push(enemy_king_moves).uniq.flatten(1).compact
   end
 
-  def find_king(team_pieces)
-    team_pieces.find { |piece| piece.type == "K" }
+  def invalid_king_moves_from_standard_pieces(color)
+    enemy_pieces = color == "w" ? @black_pieces : @white_pieces
+    enemy_color = color == "w" ? "b" : "w"
+    enemy_pieces.map do |piece|
+      if %w[K p].include?(piece.type)
+        pawn_taking_positions(enemy_color, piece.position) if piece.type == "p"
+      else
+        non_taking_moves(piece)
+      end
+    end
+  end
+
+  def invalid_king_moves_from_enemy_king(enemy_color)
+    enemy_king_pos = find_king(enemy_color).position
+
+    KING_MOVES.map do |move_dir|
+      x_coord = enemy_king_pos[0] + move_dir[0]
+      y_coord = enemy_king_pos[1] + move_dir[1]
+
+      [x_coord, y_coord] if x_coord.between?(0, 7) && y_coord.between?(0, 7)
+    end
+  end
+
+  def find_king(color)
+    team = color == "w" ? @white_pieces : @black_pieces
+    team.find { |piece| piece.type == "K" }
   end
 
   def taking_pawn_moves(color, pos)
-    up_or_down = color == "w" ? -1 : 1
-
-    valid_moves = [-1, 1].map do |dir|
-      move = [pos[0] + up_or_down, pos[1] + dir]
+    valid_moves = pawn_taking_positions(color, pos).map do |move|
       move if can_take_at?(color, move)
     end
 
-    valid_moves.union(en_passant_moves(color, pos)).compact
+    valid_moves.union(en_passant_move(color, pos)).compact
   end
 
   def taking_rook_moves(color, pos)
@@ -221,8 +237,8 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
   end
 
   def taking_rec(color, pos, x_shift, y_shift)
-    return [] if @board[pos[0]].nil? || @board[pos[0]][pos[1]].nil?
     return [pos] if can_take_at?(color, pos)
+    return [] unless can_move_without_taking_at?(pos)
 
     taking_rec(color, [pos[0] + x_shift, pos[1] + y_shift], x_shift, y_shift)
   end
@@ -247,6 +263,17 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
       .union(taking_rec(color, [pos[0] - 1, pos[1] + 1], -1, 1))
   end
 
+  def pawn_taking_positions(color, pos)
+    up_or_down = color == "w" ? -1 : 1
+
+    [-1, 1].map do |left_or_right|
+      if (pos[0] + up_or_down).between?(0, 7) &&
+         (pos[1] + left_or_right).between?(0, 7)
+        [pos[0] + up_or_down, pos[1] + left_or_right]
+      end
+    end.compact
+  end
+
   def can_take_at?(color, pos)
     pos[0] >= 0 && pos[1] >= 0 &&
       !spot_empty?([pos[0], pos[1]]) && (@board[pos[0]][pos[1]].color != color)
@@ -269,8 +296,8 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
     end
   end
 
-  def protected_by_king(color, pieces)
-    king = find_king(pieces)
+  def protected_by_king(color)
+    king = find_king(color)
 
     KING_MOVES.map do |dir|
       move = [king.position[0] + dir[0], king.position[1] + dir[1]]
@@ -297,7 +324,7 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
     pieces = color == "w" ? @white_pieces : @black_pieces
 
     protected_by_pawn(color, pieces)
-      .union(protected_by_king(color, pieces))
+      .union(protected_by_king(color))
       .union(protected_by_other(color, pieces))
   end
 
