@@ -40,6 +40,28 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
     end
   end
 
+  def en_passant_move(color, position)
+    up_or_down = color == "w" ? -1 : 1
+
+    # don't have to search every val since a maximum of one capture will be possible
+    [-1, 1].each do |dir|
+      next if spot_empty?([position[0], position[1] + dir])
+
+      adjacent_piece = find_adjacent_piece_in_dir(position, dir)
+
+      if adjacent_piece.color != color && adjacent_piece.type == "p" &&
+         adjacent_piece.can_en_passant == true
+        return [[position[0] + up_or_down, position[1] + dir]]
+      end
+    end
+
+    []
+  end
+
+  def find_adjacent_piece_in_dir(pawn_pos, dir)
+    @board[pawn_pos[0]][pawn_pos[1] + dir]
+  end
+
   def non_taking_rec(pos, x_shift, y_shift)
     return [] unless can_move_without_taking_at?(pos)
 
@@ -215,25 +237,6 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
     end
 
     moves.compact.difference(protected_pieces(opposite_color))
-  end
-
-  def en_passant_moves(color, position) # rubocop: disable Metrics/AbcSize
-    up_or_down = color == "w" ? -1 : 1
-
-    # don't have to search every val since a maximum
-    # of one capture by en passant will be possible
-    [-1, 1].each do |dir|
-      next if spot_empty?([position[0], position[1] + dir])
-
-      adjacent_piece = @board[position[0]][position[1] + dir]
-
-      if adjacent_piece.color != color && adjacent_piece.type == "p" &&
-         adjacent_piece.can_en_passant == true
-        return [[position[0] + up_or_down, position[1] + dir]]
-      end
-    end
-
-    []
   end
 
   def taking_rec(color, pos, x_shift, y_shift)
