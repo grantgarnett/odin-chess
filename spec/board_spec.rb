@@ -4,17 +4,17 @@ describe Board do
   subject(:board_test) { described_class.new }
   context("when initialized") do
     it "puts black pieces on the top files" do
-      random_black_pawn = board_test.board[1][3]
+      random_black_pawn = board_test.game_state[1][3]
       expect(random_black_pawn.color).to eq("b")
     end
 
     it "puts white pieces on the bottom files" do
-      random_white_pawn = board_test.board[7][5]
+      random_white_pawn = board_test.game_state[7][5]
       expect(random_white_pawn.color).to eq("w")
     end
 
     it "puts empty pieces in the middle" do
-      random_space = board_test.board[3][4]
+      random_space = board_test.game_state[3][4]
       expect(random_space).to eq("x")
     end
   end
@@ -40,7 +40,7 @@ describe Board do
       end
 
       it "moves the piece to the correct location" do
-        expect(board_test.board[4][3]).to eq(generic_piece)
+        expect(board_test.game_state[4][3]).to eq(generic_piece)
       end
 
       it "updates the position variable for the piece" do
@@ -48,7 +48,7 @@ describe Board do
       end
 
       it "empties the space where the piece was" do
-        expect(board_test.board[6][3]).to eq("x")
+        expect(board_test.game_state[6][3]).to eq("x")
       end
     end
 
@@ -59,7 +59,7 @@ describe Board do
       before do
         allow(generic_black_piece).to receive(:position=)
         board_test.instance_variable_set(:@white_pieces, [generic_white_piece])
-        board_test.instance_variable_set(:@board,
+        board_test.instance_variable_set(:@game_state,
                                          [%w[x x x x x x x x],
                                           %w[x x x x x x x x],
                                           ["x", "x", generic_black_piece, "x", "x", "x", "x", "x"],
@@ -71,7 +71,7 @@ describe Board do
         board_test.move_piece(generic_black_piece, [4, 4])
       end
       it "replaces the original piece with the new one at the target location" do
-        expect(board_test.board[4][4]).to eq(generic_black_piece)
+        expect(board_test.game_state[4][4]).to eq(generic_black_piece)
       end
 
       it "updates the location variable for the piece" do
@@ -79,7 +79,7 @@ describe Board do
       end
 
       it "empties the space where the piece was" do
-        expect(board_test.board[2][2]).to eq("x")
+        expect(board_test.game_state[2][2]).to eq("x")
       end
 
       it "removes the original piece from its corresponding team array" do

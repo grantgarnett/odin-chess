@@ -10,7 +10,7 @@ describe ValidateMoves do
       let(:piece_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -29,7 +29,7 @@ describe ValidateMoves do
       let(:starting_pawn) { double("pawn", type: "p", color: "w", position: [6, 6], move_by_two: true) }
 
       it "returns the correct set of moves" do
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -49,7 +49,7 @@ describe ValidateMoves do
       let(:piece_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -68,7 +68,7 @@ describe ValidateMoves do
       let(:pawn) { double("pawn", type: "p", color: "w", position: [5, 3], move_by_two: false) }
 
       it "returns the correct set of moves" do
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -89,7 +89,7 @@ describe ValidateMoves do
       let(:other_piece_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -112,7 +112,7 @@ describe ValidateMoves do
       let(:other_piece_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [["x", "x", "x", "x", other_piece_in_way, "x", "x"],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -132,7 +132,7 @@ describe ValidateMoves do
       let(:piece_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x],
                                                     [piece_in_way, "x", "x", "x", "x", "x", "x", "x"],
                                                     %w[x x x x x x x x],
@@ -154,7 +154,7 @@ describe ValidateMoves do
       let(:piece_not_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x],
                                                     [piece_not_in_way, "x", "x", "x", "x", "x", "x", "x"],
                                                     %w[x x x x x x x x],
@@ -173,7 +173,7 @@ describe ValidateMoves do
       let(:piece_in_way) { double("same colored piece") }
 
       it "returns the correct set of moves" do
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -192,7 +192,7 @@ describe ValidateMoves do
     context "when given a king, and a check is in the way" do
       let(:king) { double("king", type: "K", color: "w", position: [7, 4]) }
       it "returns the correct set of moves" do
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -219,7 +219,7 @@ describe ValidateMoves do
       it "can take enemy pieces" do
         allow(white_pawn).to receive(:position).and_return([4, 3])
         move_validator.board.instance_variable_set(:@black_pieces, [black_piece])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -236,7 +236,7 @@ describe ValidateMoves do
       it "ignores same colored pieces" do
         allow(white_pawn).to receive(:position).and_return([4, 3])
         move_validator.board.instance_variable_set(:@black_pieces, [])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -254,7 +254,7 @@ describe ValidateMoves do
         allow(black_pawn).to receive(:position).and_return([3, 5])
         allow(black_pawn).to receive(:can_en_passant).and_return true
         move_validator.board.instance_variable_set(:@black_pieces, [black_pawn])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -272,7 +272,7 @@ describe ValidateMoves do
         allow(black_pawn).to receive(:position).and_return([2, 5])
         allow(black_pawn).to receive(:can_en_passant).and_return false
         move_validator.board.instance_variable_set(:@black_pieces, [black_pawn])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     ["x", "x", "x", "x", white_pawn, black_pawn, "x", "x"],
@@ -291,7 +291,7 @@ describe ValidateMoves do
         allow(white_piece).to receive(:position).and_return([5, 2])
         allow(white_pawn).to receive(:can_en_passant).and_return true
         move_validator.board.instance_variable_set(:@black_pieces, [black_pawn])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -313,7 +313,7 @@ describe ValidateMoves do
 
       it "returns the correct set of moves" do
         move_validator.board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     ["x", "x", "x", black_piece_one, "x", "x", "x", "x"],
                                                     %w[x x x x x x x x],
@@ -338,7 +338,7 @@ describe ValidateMoves do
       it "returns the correct set of moves" do
         move_validator.board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two,
                                                                     black_piece_three])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     ["x", "x", "x", black_piece_one, "x", "x", "x", "x"],
                                                     ["x", "x", "x", "x", "x", "x", black_piece_two, "x"],
@@ -364,7 +364,7 @@ describe ValidateMoves do
       it "returns the correct set of moves" do
         move_validator.board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two,
                                                                     black_piece_three, black_piece_four])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [["x", white_piece, "x", "x", "x", "x", "x", "x"],
                                                     %w[x x x x x x x x],
                                                     ["x", "x", "x", black_piece_one, "x", "x", "x", "x"],
@@ -388,7 +388,7 @@ describe ValidateMoves do
       it "returns the correct set of moves" do
         move_validator.board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two,
                                                                     black_piece_three])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -414,7 +414,7 @@ describe ValidateMoves do
         allow(black_rook).to receive(:color).and_return("w").once
 
         move_validator.board.instance_variable_set(:@black_pieces, [black_king, black_pawn, black_rook])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     ["x", black_king, "x", "x", "x", "x", "x", "x"],
                                                     %w[x x x x x x x x],
@@ -440,7 +440,7 @@ describe ValidateMoves do
           allow(black_king).to receive(:position).and_return([4, 2])
 
           move_validator.board.instance_variable_set(:@black_pieces, [black_king, black_pawn])
-          move_validator.board.instance_variable_set(:@board,
+          move_validator.board.instance_variable_set(:@game_state,
                                                      [%w[x x x x x x x x],
                                                       %w[x x x x x x x x],
                                                       %w[x x x x x x x x],
@@ -464,7 +464,7 @@ describe ValidateMoves do
           allow(black_bishop).to receive(:color).and_return("w").once
 
           move_validator.board.instance_variable_set(:@black_pieces, [black_pawn, black_bishop, black_king])
-          move_validator.board.instance_variable_set(:@board,
+          move_validator.board.instance_variable_set(:@game_state,
                                                      [%w[x x x x x x x x],
                                                       %w[x x x x x x x x],
                                                       ["x", black_king, "x", "x", "x", black_bishop, "x", "x"],
@@ -493,7 +493,7 @@ describe ValidateMoves do
         allow(white_rook).to receive(:color=)
 
         move_validator.board.instance_variable_set(:@white_pieces, [white_pawn, white_king, white_knight, white_rook])
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     [white_pawn, "x", "x", "x", "x", "x", "x", "x"],
                                                     ["x", black_king, white_rook, "x", "x", "x", "x", "x"],
@@ -521,7 +521,7 @@ describe ValidateMoves do
       it "returns true when both pieces can en passant and there's empty space between them" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -536,7 +536,7 @@ describe ValidateMoves do
       it "returns false when a piece is in-between them" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -551,7 +551,7 @@ describe ValidateMoves do
       it "returns false when one of the pieces cannot en passant" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return false
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -568,7 +568,7 @@ describe ValidateMoves do
       it "returns true when both pieces can en passant and there's empty space between them" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -583,7 +583,7 @@ describe ValidateMoves do
       it "returns false when a piece is in the way" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -598,7 +598,7 @@ describe ValidateMoves do
       it "returns false when one of the pieces cannot en passant" do
         allow(white_king).to receive(:can_castle).and_return false
         allow(white_short_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [%w[x x x x x x x x],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -615,7 +615,7 @@ describe ValidateMoves do
       it "returns true when both pieces can en passant and there's empty space between them" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_short_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -630,7 +630,7 @@ describe ValidateMoves do
       it "returns false when a piece is in the way" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_short_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [[black_long_rook, "x", "x", "x", black_king, "x", generic_piece, black_short_rook],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -645,7 +645,7 @@ describe ValidateMoves do
       it "returns false when one of the pieces cannot en passant" do
         allow(black_king).to receive(:can_castle).and_return false
         allow(black_short_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -662,7 +662,7 @@ describe ValidateMoves do
       it "returns true when both pieces can en passant and there's empty space between them" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_long_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -677,7 +677,7 @@ describe ValidateMoves do
       it "returns false when a piece is in the way" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_long_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [[black_long_rook, generic_piece, "x", "x", black_king, "x", "x", black_short_rook],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -692,7 +692,7 @@ describe ValidateMoves do
       it "returns false when one of the pieces cannot en passant" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_long_rook).to receive(:can_castle).and_return false
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
                                                     %w[x x x x x x x x],
                                                     %w[x x x x x x x x],
@@ -709,7 +709,7 @@ describe ValidateMoves do
       it "returns false" do
         allow(black_king).to receive(:can_castle).and_return false
         allow(black_long_rook).to receive(:can_castle).and_return true
-        move_validator.board.instance_variable_set(:@board,
+        move_validator.board.instance_variable_set(:@game_state,
                                                    [["x", "x", "x", "x", "x", "x", "x", black_short_rook],
                                                     ["x", "x", "x", "x", black_king, "x", "x", "x"],
                                                     %w[x x x x x x x x],

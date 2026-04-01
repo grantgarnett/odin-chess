@@ -65,7 +65,7 @@ class ValidateMoves # rubocop: disable Metrics/ClassLength
   end
 
   def find_adjacent_piece_in_dir(pawn_pos, dir)
-    board.board[pawn_pos[0]][pawn_pos[1] + dir]
+    board.game_state[pawn_pos[0]][pawn_pos[1] + dir]
   end
 
   def non_taking_rec(pos, x_shift, y_shift)
@@ -127,13 +127,13 @@ class ValidateMoves # rubocop: disable Metrics/ClassLength
 
   def can_move_without_taking_at?(move)
     move[0].between?(0, 7) && move[1].between?(0, 7) &&
-      board.board[move[0]][move[1]] == "x"
+      board.game_state[move[0]][move[1]] == "x"
   end
 
   def spot_empty?(pos)
-    board.board[pos[0]].nil? ||
-      board.board[pos[0]][pos[1]].nil? ||
-      board.board[pos[0]][pos[1]] == "x"
+    board.game_state[pos[0]].nil? ||
+      board.game_state[pos[0]][pos[1]].nil? ||
+      board.game_state[pos[0]][pos[1]] == "x"
   end
 
   def can_move_from_pos_to?(pos, x_shift, y_shift)
@@ -286,13 +286,13 @@ class ValidateMoves # rubocop: disable Metrics/ClassLength
   def can_take_at?(color, pos)
     pos[0] >= 0 && pos[1] >= 0 &&
       !spot_empty?([pos[0],
-                    pos[1]]) && (board.board[pos[0]][pos[1]].color != color)
+                    pos[1]]) && (board.game_state[pos[0]][pos[1]].color != color)
   end
 
   def can_protect_at?(color, pos)
     pos[0] >= 0 && pos[1] >= 0 &&
       !spot_empty?([pos[0],
-                    pos[1]]) && (board.board[pos[0]][pos[1]].color == color)
+                    pos[1]]) && (board.game_state[pos[0]][pos[1]].color == color)
   end
 
   def protected_by_pawn(color, pieces)
@@ -356,8 +356,8 @@ class ValidateMoves # rubocop: disable Metrics/ClassLength
   end
 
   def can_castle_at?(start_pos, type)
-    !spot_empty?(start_pos) && board.board[start_pos[0]][start_pos[1]].type == type &&
-      board.board[start_pos[0]][start_pos[1]].can_castle
+    !spot_empty?(start_pos) && board.game_state[start_pos[0]][start_pos[1]].type == type &&
+      board.game_state[start_pos[0]][start_pos[1]].can_castle
   end
 
   def can_white_short_castle?
@@ -366,7 +366,7 @@ class ValidateMoves # rubocop: disable Metrics/ClassLength
 
     can_castle_at?(king_starting_pos, "K") &&
       can_castle_at?(rook_starting_pos, "R") &&
-      board.board[7][5] == "x" && board.board[7][6] == "x"
+      board.game_state[7][5] == "x" && board.game_state[7][6] == "x"
   end
 
   def can_black_short_castle?
@@ -375,7 +375,7 @@ class ValidateMoves # rubocop: disable Metrics/ClassLength
 
     can_castle_at?(king_starting_pos, "K") &&
       can_castle_at?(rook_starting_pos, "R") &&
-      board.board[0][5] == "x" && board.board[0][6] == "x"
+      board.game_state[0][5] == "x" && board.game_state[0][6] == "x"
   end
 
   def can_white_long_castle?
@@ -384,7 +384,7 @@ class ValidateMoves # rubocop: disable Metrics/ClassLength
 
     can_castle_at?(king_starting_pos, "K") &&
       can_castle_at?(rook_starting_pos, "R") &&
-      board.board[7][1] == "x" && board.board[7][2] == "x" && board.board[7][3] == "x"
+      board.game_state[7][1] == "x" && board.game_state[7][2] == "x" && board.game_state[7][3] == "x"
   end
 
   def can_black_long_castle?
@@ -393,6 +393,6 @@ class ValidateMoves # rubocop: disable Metrics/ClassLength
 
     can_castle_at?(king_starting_pos, "K") &&
       can_castle_at?(rook_starting_pos, "R") &&
-      board.board[0][1] == "x" && board.board[0][2] == "x" && board.board[0][3] == "x"
+      board.game_state[0][1] == "x" && board.game_state[0][2] == "x" && board.game_state[0][3] == "x"
   end
 end

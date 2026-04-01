@@ -9,7 +9,7 @@ describe DetermineCheckAndMate do
       it "returns true" do
         check_determination.board.instance_variable_set(:@white_pieces, [white_king])
         check_determination.board.instance_variable_set(:@black_pieces, [black_rook])
-        check_determination.board.instance_variable_set(:@board,
+        check_determination.board.instance_variable_set(:@game_state,
                                                         [%w[x x x x x x x x],
                                                          %w[x x x x x x x x],
                                                          ["x", "x", black_rook, "x", "x", "x", "x", "x"],
@@ -29,7 +29,7 @@ describe DetermineCheckAndMate do
       it "returns false" do
         check_determination.board.instance_variable_set(:@white_pieces, [white_king])
         check_determination.board.instance_variable_set(:@black_pieces, [black_bishop])
-        check_determination.board.instance_variable_set(:@board,
+        check_determination.board.instance_variable_set(:@game_state,
                                                         [%w[x x x x x x x x],
                                                          %w[x x x x x x x x],
                                                          %w[x x x x x x x x],
@@ -48,7 +48,7 @@ describe DetermineCheckAndMate do
       it "returns true" do
         check_determination.board.instance_variable_set(:@black_pieces, [black_king])
         check_determination.board.instance_variable_set(:@white_pieces, [white_knight])
-        check_determination.board.instance_variable_set(:@board,
+        check_determination.board.instance_variable_set(:@game_state,
                                                         [%w[x x x x x x x x],
                                                          %w[x x x x x x x x],
                                                          %w[x x x x x x x x],
@@ -67,7 +67,7 @@ describe DetermineCheckAndMate do
       it "returns false" do
         check_determination.board.instance_variable_set(:@black_pieces, [black_king])
         check_determination.board.instance_variable_set(:@white_pieces, [white_pawn])
-        check_determination.board.instance_variable_set(:@board,
+        check_determination.board.instance_variable_set(:@game_state,
                                                         [%w[x x x x x x x x],
                                                          %w[x x x x x x x x],
                                                          %w[x x x x x x x x],

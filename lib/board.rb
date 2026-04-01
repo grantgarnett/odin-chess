@@ -4,10 +4,10 @@ require_relative "validate_moves"
 # This class is responsible for updating the state of the board
 # and answering questions about the board state
 class Board # rubocop: disable Metrics/ClassLength
-  attr_reader :board, :white_pieces, :black_pieces
+  attr_reader :game_state, :white_pieces, :black_pieces
 
   def initialize
-    @board = generate_board
+    @game_state = generate_board
     @white_pieces = generate_white_piece_arr
     @black_pieces = generate_black_piece_arr
   end
@@ -17,7 +17,7 @@ class Board # rubocop: disable Metrics/ClassLength
 
     if taking_by_en_passant?(piece, target)
       en_passant(piece, target)
-    elsif @board[target[0]][target[1]] == "x"
+    elsif game_state[target[0]][target[1]] == "x"
       non_taking_move(piece, target)
     else
       taking_move(piece, target)
@@ -36,14 +36,14 @@ class Board # rubocop: disable Metrics/ClassLength
   private
 
   def generate_board
-    @board = [generate_back_row("b"),
-              generate_pawns("b"),
-              %w[x x x x x x x x],
-              %w[x x x x x x x x],
-              %w[x x x x x x x x],
-              %w[x x x x x x x x],
-              generate_pawns("w"),
-              generate_back_row("w")]
+    [generate_back_row("b"),
+     generate_pawns("b"),
+     %w[x x x x x x x x],
+     %w[x x x x x x x x],
+     %w[x x x x x x x x],
+     %w[x x x x x x x x],
+     generate_pawns("w"),
+     generate_back_row("w")]
   end
 
   def generate_pawns(color)
@@ -67,7 +67,7 @@ class Board # rubocop: disable Metrics/ClassLength
   end
 
   def generate_white_piece_arr
-    @board.map do |row|
+    game_state.map do |row|
       row.select do |el|
         el.color == "w" unless el == "x"
       end
@@ -75,7 +75,7 @@ class Board # rubocop: disable Metrics/ClassLength
   end
 
   def generate_black_piece_arr
-    @board.map do |row|
+    game_state.map do |row|
       row.select do |el|
         el.color == "b" unless el == "x"
       end
@@ -85,9 +85,9 @@ class Board # rubocop: disable Metrics/ClassLength
   def en_passant(piece, target)
     non_taking_move(piece, target)
     direction_of_removal = piece.color == "w" ? 1 : -1
-    taken_piece = @board[target[0] + direction_of_removal][target[1]]
+    taken_piece = game_state[target[0] + direction_of_removal][target[1]]
 
-    @board[target[0] + direction_of_removal][target[1]] = "x"
+    game_state[target[0] + direction_of_removal][target[1]] = "x"
     remove_from_team_arr(taken_piece)
   end
 
@@ -95,18 +95,18 @@ class Board # rubocop: disable Metrics/ClassLength
     position_before = piece.position
     piece.position = target
 
-    @board[target[0]][target[1]] = piece
-    @board[position_before[0]][position_before[1]] = "x"
+    game_state[target[0]][target[1]] = piece
+    game_state[position_before[0]][position_before[1]] = "x"
   end
 
   def taking_move(piece, target)
-    taken_piece = @board[target[0]][target[1]]
+    taken_piece = game_state[target[0]][target[1]]
 
     position_before = piece.position
     piece.position = target
 
-    @board[target[0]][target[1]] = piece
-    @board[position_before[0]][position_before[1]] = "x"
+    game_state[target[0]][target[1]] = piece
+    game_state[position_before[0]][position_before[1]] = "x"
 
     remove_from_team_arr(taken_piece)
   end
@@ -141,26 +141,26 @@ class Board # rubocop: disable Metrics/ClassLength
   def taking_by_en_passant?(piece, target)
     piece.type == "p" &&
       piece.position[1] != target[1] &&
-      @board[target[0]][target[1]] == "x"
+      game_state[target[0]][target[1]] == "x"
   end
 
   def white_short_castle
-    move_piece(@board[7][7], [7, 5])
-    move_piece(@board[7][4], [7, 6])
+    move_piece(game_state[7][7], [7, 5])
+    move_piece(game_state[7][4], [7, 6])
   end
 
   def white_long_castle
-    move_piece(@board[7][0], [7, 3])
-    move_piece(@board[7][4], [7, 2])
+    move_piece(game_state[7][0], [7, 3])
+    move_piece(game_state[7][4], [7, 2])
   end
 
   def black_short_castle
-    move_piece(@board[0][7], [0, 5])
-    move_piece(@board[0][4], [0, 6])
+    move_piece(game_state[0][7], [0, 5])
+    move_piece(game_state[0][4], [0, 6])
   end
 
   def black_long_castle
-    move_piece(@board[0][0], [0, 3])
-    move_piece(@board[0][4], [0, 2])
+    move_piece(game_state[0][0], [0, 3])
+    move_piece(game_state[0][4], [0, 2])
   end
 end
