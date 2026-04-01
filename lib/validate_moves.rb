@@ -2,12 +2,18 @@
 # Moves that involve taking are separated into their own
 # context, due to the use of algebraic notation in our
 # implementation of chess
-module ValidateMoves # rubocop: disable Metrics/ModuleLength
+class ValidateMoves # rubocop: disable Metrics/ClassLength
+  attr_reader :board
+
   KNIGHT_MOVES = [[1, 2], [-1, 2], [2, 1], [-2, 1],
                   [1, -2], [-1, -2], [2, -1], [-2, -1]].freeze
 
   KING_MOVES = [[1, -1], [1, 0], [1, 1], [0, -1],
                 [0, 1], [-1, -1], [-1, 0], [-1, 1]].freeze
+
+  def initialize(board)
+    @board = board
+  end
 
   def non_taking_moves(piece) # rubocop: disable Metrics/AbcSize
     case piece.type
@@ -59,7 +65,7 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
   end
 
   def find_adjacent_piece_in_dir(pawn_pos, dir)
-    @board[pawn_pos[0]][pawn_pos[1] + dir]
+    board.board[pawn_pos[0]][pawn_pos[1] + dir]
   end
 
   def non_taking_rec(pos, x_shift, y_shift)
@@ -121,13 +127,13 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
 
   def can_move_without_taking_at?(move)
     move[0].between?(0, 7) && move[1].between?(0, 7) &&
-      @board[move[0]][move[1]] == "x"
+      board.board[move[0]][move[1]] == "x"
   end
 
   def spot_empty?(pos)
-    @board[pos[0]].nil? ||
-      @board[pos[0]][pos[1]].nil? ||
-      @board[pos[0]][pos[1]] == "x"
+    board.board[pos[0]].nil? ||
+      board.board[pos[0]][pos[1]].nil? ||
+      board.board[pos[0]][pos[1]] == "x"
   end
 
   def can_move_from_pos_to?(pos, x_shift, y_shift)
@@ -169,7 +175,7 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
   end
 
   def invalid_king_moves_from_standard_pieces(color)
-    enemy_pieces = color == "w" ? @black_pieces : @white_pieces
+    enemy_pieces = color == "w" ? board.black_pieces : board.white_pieces
     enemy_color = color == "w" ? "b" : "w"
     enemy_pieces.map do |piece|
       if %w[K p].include?(piece.type)
@@ -192,7 +198,7 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
   end
 
   def find_king(color)
-    team = color == "w" ? @white_pieces : @black_pieces
+    team = color == "w" ? board.white_pieces : board.black_pieces
     team.find { |piece| piece.type == "K" }
   end
 
@@ -279,12 +285,14 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
 
   def can_take_at?(color, pos)
     pos[0] >= 0 && pos[1] >= 0 &&
-      !spot_empty?([pos[0], pos[1]]) && (@board[pos[0]][pos[1]].color != color)
+      !spot_empty?([pos[0],
+                    pos[1]]) && (board.board[pos[0]][pos[1]].color != color)
   end
 
   def can_protect_at?(color, pos)
     pos[0] >= 0 && pos[1] >= 0 &&
-      !spot_empty?([pos[0], pos[1]]) && (@board[pos[0]][pos[1]].color == color)
+      !spot_empty?([pos[0],
+                    pos[1]]) && (board.board[pos[0]][pos[1]].color == color)
   end
 
   def protected_by_pawn(color, pieces)
@@ -324,7 +332,7 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
   end
 
   def protected_pieces(color)
-    pieces = color == "w" ? @white_pieces : @black_pieces
+    pieces = color == "w" ? board.white_pieces : board.black_pieces
 
     protected_by_pawn(color, pieces)
       .union(protected_by_king(color))
@@ -348,8 +356,8 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
   end
 
   def can_castle_at?(start_pos, type)
-    !spot_empty?(start_pos) && @board[start_pos[0]][start_pos[1]].type == type &&
-      @board[start_pos[0]][start_pos[1]].can_castle
+    !spot_empty?(start_pos) && board.board[start_pos[0]][start_pos[1]].type == type &&
+      board.board[start_pos[0]][start_pos[1]].can_castle
   end
 
   def can_white_short_castle?
@@ -358,7 +366,7 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
 
     can_castle_at?(king_starting_pos, "K") &&
       can_castle_at?(rook_starting_pos, "R") &&
-      @board[7][5] == "x" && @board[7][6] == "x"
+      board.board[7][5] == "x" && board.board[7][6] == "x"
   end
 
   def can_black_short_castle?
@@ -367,7 +375,7 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
 
     can_castle_at?(king_starting_pos, "K") &&
       can_castle_at?(rook_starting_pos, "R") &&
-      @board[0][5] == "x" && @board[0][6] == "x"
+      board.board[0][5] == "x" && board.board[0][6] == "x"
   end
 
   def can_white_long_castle?
@@ -376,7 +384,7 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
 
     can_castle_at?(king_starting_pos, "K") &&
       can_castle_at?(rook_starting_pos, "R") &&
-      @board[7][1] == "x" && @board[7][2] == "x" && @board[7][3] == "x"
+      board.board[7][1] == "x" && board.board[7][2] == "x" && board.board[7][3] == "x"
   end
 
   def can_black_long_castle?
@@ -385,6 +393,6 @@ module ValidateMoves # rubocop: disable Metrics/ModuleLength
 
     can_castle_at?(king_starting_pos, "K") &&
       can_castle_at?(rook_starting_pos, "R") &&
-      @board[0][1] == "x" && @board[0][2] == "x" && @board[0][3] == "x"
+      board.board[0][1] == "x" && board.board[0][2] == "x" && board.board[0][3] == "x"
   end
 end

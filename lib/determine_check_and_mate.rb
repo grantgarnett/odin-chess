@@ -9,19 +9,14 @@ require_relative "validate_moves"
 # access to methods that calculate defending
 # moves for a piece. clarifying this now
 # since validate_moves will be split up eventually
-module DetermineCheckAndMate
-  include ValidateMoves
-
+class DetermineCheckAndMate < ValidateMoves
   def in_check?(color)
-    team = color == "w" ? @white_pieces : @black_pieces
+    team = color == "w" ? board.white_pieces : board.black_pieces
     king = team.find { |piece| piece.type == "K" }
 
-    enemy_team = color == "w" ? @black_pieces : @white_pieces
+    enemy_team = color == "w" ? board.black_pieces : board.white_pieces
     enemy_team.any? do |piece|
       taking_moves(piece).include? king.position
     end
-  end
-
-  def checkmate?(color)
   end
 end

@@ -1,7 +1,8 @@
 require_relative "../lib/board"
+require_relative "../lib/validate_moves"
 
 describe ValidateMoves do
-  subject(:pretend_board) { Class.new { extend ValidateMoves } }
+  subject(:move_validator) { described_class.new(Board.new) }
 
   describe "#non_taking_moves" do
     context "when given a pawn that has not moved, and a piece is in the way" do
@@ -9,17 +10,17 @@ describe ValidateMoves do
       let(:piece_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", "x", "x", "x", piece_in_way, "x"],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", "x", "x", "x", starting_pawn, "x"],
-                                             %w[x x x x x x x x]])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", "x", "x", "x", piece_in_way, "x"],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", "x", "x", "x", starting_pawn, "x"],
+                                                    %w[x x x x x x x x]])
 
-        valid_moves = pretend_board.non_taking_moves(starting_pawn)
+        valid_moves = move_validator.non_taking_moves(starting_pawn)
         expect(valid_moves).to eq([[5, 6]])
       end
     end
@@ -28,17 +29,17 @@ describe ValidateMoves do
       let(:starting_pawn) { double("pawn", type: "p", color: "w", position: [6, 6], move_by_two: true) }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", "x", "x", "x", starting_pawn, "x"],
-                                             %w[x x x x x x x x]])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", "x", "x", "x", starting_pawn, "x"],
+                                                    %w[x x x x x x x x]])
 
-        valid_moves = pretend_board.non_taking_moves(starting_pawn)
+        valid_moves = move_validator.non_taking_moves(starting_pawn)
         expect(valid_moves).to eq([[5, 6], [4, 6]])
       end
     end
@@ -48,17 +49,17 @@ describe ValidateMoves do
       let(:piece_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", piece_in_way, "x", "x", "x", "x"],
-                                             ["x", "x", "x", pawn, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", piece_in_way, "x", "x", "x", "x"],
+                                                    ["x", "x", "x", pawn, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
 
-        valid_moves = pretend_board.non_taking_moves(pawn)
+        valid_moves = move_validator.non_taking_moves(pawn)
         expect(valid_moves).to eq([])
       end
     end
@@ -67,17 +68,17 @@ describe ValidateMoves do
       let(:pawn) { double("pawn", type: "p", color: "w", position: [5, 3], move_by_two: false) }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", pawn, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", pawn, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
 
-        valid_moves = pretend_board.non_taking_moves(pawn)
+        valid_moves = move_validator.non_taking_moves(pawn)
         expect(valid_moves).to eq([[4, 3]])
       end
     end
@@ -88,17 +89,17 @@ describe ValidateMoves do
       let(:other_piece_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", "x", rook, "x", "x", other_piece_in_way],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", "x", piece_in_way, "x", "x", "x"],
-                                             %w[x x x x x x x x]])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", "x", rook, "x", "x", other_piece_in_way],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", "x", piece_in_way, "x", "x", "x"],
+                                                    %w[x x x x x x x x]])
 
-        valid_moves = pretend_board.non_taking_moves(rook)
+        valid_moves = move_validator.non_taking_moves(rook)
         expect(valid_moves).to contain_exactly([2, 4], [1, 4], [0, 4], [4, 4],
                                                [5, 4], [3, 3], [3, 2], [3, 1],
                                                [3, 0], [3, 5], [3, 6])
@@ -111,17 +112,17 @@ describe ValidateMoves do
       let(:other_piece_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@board,
-                                            [["x", "x", "x", "x", other_piece_in_way, "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", bishop, "x", "x", "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", "x", piece_in_way, "x", "x", "x"],
-                                             %w[x x x x x x x x]])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [["x", "x", "x", "x", other_piece_in_way, "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", bishop, "x", "x", "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", "x", piece_in_way, "x", "x", "x"],
+                                                    %w[x x x x x x x x]])
 
-        valid_moves = pretend_board.non_taking_moves(bishop)
+        valid_moves = move_validator.non_taking_moves(bishop)
         expect(valid_moves).to contain_exactly([2, 0], [4, 2], [5, 3], [4, 0], [2, 2], [1, 3])
       end
     end
@@ -131,16 +132,16 @@ describe ValidateMoves do
       let(:piece_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x],
-                                             [piece_in_way, "x", "x", "x", "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             [queen, "x", "x", "x", "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        valid_moves = pretend_board.non_taking_moves(queen)
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x],
+                                                    [piece_in_way, "x", "x", "x", "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    [queen, "x", "x", "x", "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        valid_moves = move_validator.non_taking_moves(queen)
         expect(valid_moves).to contain_exactly([3, 0], [2, 0], [5, 0], [6, 0], [7, 0], [4, 1],
                                                [4, 2], [4, 3], [4, 4], [4, 5], [4, 6], [4, 7],
                                                [5, 1], [6, 2], [7, 3], [3, 1], [2, 2], [1, 3], [0, 4])
@@ -153,16 +154,16 @@ describe ValidateMoves do
       let(:piece_not_in_way) { double("generic piece") }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x],
-                                             [piece_not_in_way, "x", "x", "x", "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", knight, "x", "x", "x", "x", "x"],
-                                             [piece_in_way, "x", "x", "x", "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        valid_moves = pretend_board.non_taking_moves(knight)
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x],
+                                                    [piece_not_in_way, "x", "x", "x", "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", knight, "x", "x", "x", "x", "x"],
+                                                    [piece_in_way, "x", "x", "x", "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        valid_moves = move_validator.non_taking_moves(knight)
         expect(valid_moves).to contain_exactly([2, 3], [3, 4], [5, 4], [6, 3], [6, 1], [3, 0], [2, 1])
       end
     end
@@ -172,18 +173,18 @@ describe ValidateMoves do
       let(:piece_in_way) { double("same colored piece") }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", piece_in_way, "x", "x", "x", "x"],
-                                             ["x", "x", "x", "x", king, "x", "x", "x"]])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", piece_in_way, "x", "x", "x", "x"],
+                                                    ["x", "x", "x", "x", king, "x", "x", "x"]])
 
-        allow(pretend_board).to receive(:invalid_non_taking_king_moves).and_return([])
-        valid_moves = pretend_board.non_taking_moves(king)
+        allow(move_validator).to receive(:invalid_non_taking_king_moves).and_return([])
+        valid_moves = move_validator.non_taking_moves(king)
         expect(valid_moves).to contain_exactly([6, 4], [6, 5], [7, 5], [7, 3])
       end
     end
@@ -191,18 +192,18 @@ describe ValidateMoves do
     context "when given a king, and a check is in the way" do
       let(:king) { double("king", type: "K", color: "w", position: [7, 4]) }
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", "x", king, "x", "x", "x"]])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", "x", king, "x", "x", "x"]])
 
-        allow(pretend_board).to receive(:invalid_non_taking_king_moves).and_return([[6, 3], [7, 3]])
-        valid_moves = pretend_board.non_taking_moves(king)
+        allow(move_validator).to receive(:invalid_non_taking_king_moves).and_return([[6, 3], [7, 3]])
+        valid_moves = move_validator.non_taking_moves(king)
         expect(valid_moves).to contain_exactly([6, 4], [6, 5], [7, 5])
       end
     end
@@ -217,34 +218,34 @@ describe ValidateMoves do
 
       it "can take enemy pieces" do
         allow(white_pawn).to receive(:position).and_return([4, 3])
-        pretend_board.instance_variable_set(:@black_pieces, [black_piece])
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", black_piece, "x", "x", "x", "x", "x"],
-                                             ["x", "x", "x", white_pawn, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
+        move_validator.board.instance_variable_set(:@black_pieces, [black_piece])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", black_piece, "x", "x", "x", "x", "x"],
+                                                    ["x", "x", "x", white_pawn, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
 
-        valid_moves = pretend_board.taking_moves(white_pawn)
+        valid_moves = move_validator.taking_moves(white_pawn)
         expect(valid_moves).to contain_exactly([3, 2])
       end
 
       it "ignores same colored pieces" do
         allow(white_pawn).to receive(:position).and_return([4, 3])
-        pretend_board.instance_variable_set(:@black_pieces, [])
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", white_piece, "x", "x", "x", "x", "x"],
-                                             ["x", "x", "x", white_pawn, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        valid_moves = pretend_board.taking_moves(white_pawn)
+        move_validator.board.instance_variable_set(:@black_pieces, [])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", white_piece, "x", "x", "x", "x", "x"],
+                                                    ["x", "x", "x", white_pawn, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        valid_moves = move_validator.taking_moves(white_pawn)
         expect(valid_moves).to contain_exactly
       end
 
@@ -252,17 +253,17 @@ describe ValidateMoves do
         allow(white_pawn).to receive(:position).and_return([3, 4])
         allow(black_pawn).to receive(:position).and_return([3, 5])
         allow(black_pawn).to receive(:can_en_passant).and_return true
-        pretend_board.instance_variable_set(:@black_pieces, [black_pawn])
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", "x", white_pawn, black_pawn, "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        valid_moves = pretend_board.taking_moves(white_pawn)
+        move_validator.board.instance_variable_set(:@black_pieces, [black_pawn])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", "x", white_pawn, black_pawn, "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        valid_moves = move_validator.taking_moves(white_pawn)
         expect(valid_moves).to contain_exactly([2, 5])
       end
 
@@ -270,17 +271,17 @@ describe ValidateMoves do
         allow(white_pawn).to receive(:position).and_return([2, 4])
         allow(black_pawn).to receive(:position).and_return([2, 5])
         allow(black_pawn).to receive(:can_en_passant).and_return false
-        pretend_board.instance_variable_set(:@black_pieces, [black_pawn])
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", "x", white_pawn, black_pawn, "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        valid_moves = pretend_board.taking_moves(white_pawn)
+        move_validator.board.instance_variable_set(:@black_pieces, [black_pawn])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", "x", white_pawn, black_pawn, "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        valid_moves = move_validator.taking_moves(white_pawn)
         expect(valid_moves).to contain_exactly
       end
 
@@ -289,17 +290,17 @@ describe ValidateMoves do
         allow(white_pawn).to receive(:position).and_return([4, 4])
         allow(white_piece).to receive(:position).and_return([5, 2])
         allow(white_pawn).to receive(:can_en_passant).and_return true
-        pretend_board.instance_variable_set(:@black_pieces, [black_pawn])
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", black_pawn, white_pawn, "x", "x", "x"],
-                                             ["x", "x", white_piece, "x", "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        valid_moves = pretend_board.taking_moves(black_pawn)
+        move_validator.board.instance_variable_set(:@black_pieces, [black_pawn])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", black_pawn, white_pawn, "x", "x", "x"],
+                                                    ["x", "x", white_piece, "x", "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        valid_moves = move_validator.taking_moves(black_pawn)
         expect(valid_moves).to contain_exactly([5, 2], [5, 4])
       end
     end
@@ -311,18 +312,18 @@ describe ValidateMoves do
       let(:white_piece) { double("generic piece", color: "w", position: [6, 3]) }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two])
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             ["x", "x", "x", black_piece_one, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", white_rook, "x", "x", "x", black_piece_two],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", white_piece, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x]])
+        move_validator.board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    ["x", "x", "x", black_piece_one, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", white_rook, "x", "x", "x", black_piece_two],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", white_piece, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x]])
 
-        valid_moves = pretend_board.taking_moves(white_rook)
+        valid_moves = move_validator.taking_moves(white_rook)
         expect(valid_moves).to contain_exactly([1, 3], [4, 7])
       end
     end
@@ -335,19 +336,19 @@ describe ValidateMoves do
       let(:white_piece) { double("generic piece", color: "w", position: [4, 6]) }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two,
-                                                             black_piece_three])
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             ["x", "x", "x", black_piece_one, "x", "x", "x", "x"],
-                                             ["x", "x", "x", "x", "x", "x", black_piece_two, "x"],
-                                             ["x", "x", "x", "x", "x", white_bishop, "x", "x"],
-                                             ["x", "x", "x", "x", "x", "x", white_piece, "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", black_piece_three, "x", "x", "x", "x", "x", "x"]])
+        move_validator.board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two,
+                                                                    black_piece_three])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    ["x", "x", "x", black_piece_one, "x", "x", "x", "x"],
+                                                    ["x", "x", "x", "x", "x", "x", black_piece_two, "x"],
+                                                    ["x", "x", "x", "x", "x", white_bishop, "x", "x"],
+                                                    ["x", "x", "x", "x", "x", "x", white_piece, "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", black_piece_three, "x", "x", "x", "x", "x", "x"]])
 
-        valid_moves = pretend_board.taking_moves(white_bishop)
+        valid_moves = move_validator.taking_moves(white_bishop)
         expect(valid_moves).to contain_exactly([1, 3], [2, 6], [7, 1])
       end
     end
@@ -361,19 +362,19 @@ describe ValidateMoves do
       let(:white_piece) { double("generic piece", color: "w", position: [0, 1]) }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two,
-                                                             black_piece_three, black_piece_four])
-        pretend_board.instance_variable_set(:@board,
-                                            [["x", white_piece, "x", "x", "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", black_piece_one, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             ["x", white_queen, "x", "x", "x", "x", black_piece_two, "x"],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", black_piece_three, "x", "x", "x", "x"],
-                                             ["x", black_piece_four, "x", "x", "x", "x", "x", "x"]])
+        move_validator.board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two,
+                                                                    black_piece_three, black_piece_four])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [["x", white_piece, "x", "x", "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", black_piece_one, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    ["x", white_queen, "x", "x", "x", "x", black_piece_two, "x"],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", black_piece_three, "x", "x", "x", "x"],
+                                                    ["x", black_piece_four, "x", "x", "x", "x", "x", "x"]])
 
-        valid_moves = pretend_board.taking_moves(white_queen)
+        valid_moves = move_validator.taking_moves(white_queen)
         expect(valid_moves).to contain_exactly([2, 3], [4, 6], [6, 3], [7, 1])
       end
     end
@@ -385,19 +386,19 @@ describe ValidateMoves do
       let(:black_piece_three) { double("generic piece", color: "b", position: [6, 3]) }
 
       it "returns the correct set of moves" do
-        pretend_board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two,
-                                                             black_piece_three])
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", black_piece_one, black_piece_two, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             ["x", white_knight, "x", "x", "x", "x", "x", "x"],
-                                             ["x", "x", "x", black_piece_three, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x]])
+        move_validator.board.instance_variable_set(:@black_pieces, [black_piece_one, black_piece_two,
+                                                                    black_piece_three])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", black_piece_one, black_piece_two, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    ["x", white_knight, "x", "x", "x", "x", "x", "x"],
+                                                    ["x", "x", "x", black_piece_three, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x]])
 
-        valid_moves = pretend_board.taking_moves(white_knight)
+        valid_moves = move_validator.taking_moves(white_knight)
         expect(valid_moves).to contain_exactly([3, 2], [6, 3])
       end
     end
@@ -412,17 +413,17 @@ describe ValidateMoves do
         allow(black_rook).to receive(:color=)
         allow(black_rook).to receive(:color).and_return("w").once
 
-        pretend_board.instance_variable_set(:@black_pieces, [black_king, black_pawn, black_rook])
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             ["x", black_king, "x", "x", "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", "x", "x", "x", black_rook, "x"],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", black_pawn, "x", "x", "x", "x"],
-                                             ["x", "x", "x", white_king, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x]])
-        valid_moves = pretend_board.taking_moves(white_king)
+        move_validator.board.instance_variable_set(:@black_pieces, [black_king, black_pawn, black_rook])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    ["x", black_king, "x", "x", "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", "x", "x", "x", black_rook, "x"],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", black_pawn, "x", "x", "x", "x"],
+                                                    ["x", "x", "x", white_king, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x]])
+        valid_moves = move_validator.taking_moves(white_king)
         expect(valid_moves).to contain_exactly([5, 3])
       end
     end
@@ -438,17 +439,17 @@ describe ValidateMoves do
         it "returns the correct set of moves" do
           allow(black_king).to receive(:position).and_return([4, 2])
 
-          pretend_board.instance_variable_set(:@black_pieces, [black_king, black_pawn])
-          pretend_board.instance_variable_set(:@board,
-                                              [%w[x x x x x x x x],
-                                               %w[x x x x x x x x],
-                                               %w[x x x x x x x x],
-                                               %w[x x x x x x x x],
-                                               ["x", "x", black_king, "x", "x", "x", "x", "x"],
-                                               ["x", "x", "x", black_pawn, "x", "x", "x", "x"],
-                                               ["x", "x", "x", white_king, "x", "x", "x", "x"],
-                                               %w[x x x x x x x x]])
-          valid_moves = pretend_board.taking_moves(white_king)
+          move_validator.board.instance_variable_set(:@black_pieces, [black_king, black_pawn])
+          move_validator.board.instance_variable_set(:@board,
+                                                     [%w[x x x x x x x x],
+                                                      %w[x x x x x x x x],
+                                                      %w[x x x x x x x x],
+                                                      %w[x x x x x x x x],
+                                                      ["x", "x", black_king, "x", "x", "x", "x", "x"],
+                                                      ["x", "x", "x", black_pawn, "x", "x", "x", "x"],
+                                                      ["x", "x", "x", white_king, "x", "x", "x", "x"],
+                                                      %w[x x x x x x x x]])
+          valid_moves = move_validator.taking_moves(white_king)
           expect(valid_moves).to contain_exactly
         end
       end
@@ -462,17 +463,17 @@ describe ValidateMoves do
           allow(black_bishop).to receive(:color=)
           allow(black_bishop).to receive(:color).and_return("w").once
 
-          pretend_board.instance_variable_set(:@black_pieces, [black_pawn, black_bishop, black_king])
-          pretend_board.instance_variable_set(:@board,
-                                              [%w[x x x x x x x x],
-                                               %w[x x x x x x x x],
-                                               ["x", black_king, "x", "x", "x", black_bishop, "x", "x"],
-                                               %w[x x x x x x x x],
-                                               %w[x x x x x x x x],
-                                               ["x", "x", black_rook, "x", "x", "x", "x", "x"],
-                                               ["x", "x", "x", white_king, "x", "x", "x", "x"],
-                                               %w[x x x x x x x x]])
-          valid_moves = pretend_board.taking_moves(white_king)
+          move_validator.board.instance_variable_set(:@black_pieces, [black_pawn, black_bishop, black_king])
+          move_validator.board.instance_variable_set(:@board,
+                                                     [%w[x x x x x x x x],
+                                                      %w[x x x x x x x x],
+                                                      ["x", black_king, "x", "x", "x", black_bishop, "x", "x"],
+                                                      %w[x x x x x x x x],
+                                                      %w[x x x x x x x x],
+                                                      ["x", "x", black_rook, "x", "x", "x", "x", "x"],
+                                                      ["x", "x", "x", white_king, "x", "x", "x", "x"],
+                                                      %w[x x x x x x x x]])
+          valid_moves = move_validator.taking_moves(white_king)
           expect(valid_moves).to contain_exactly
         end
       end
@@ -491,17 +492,17 @@ describe ValidateMoves do
         allow(white_rook).to receive(:color).and_return("w", "b", "w")
         allow(white_rook).to receive(:color=)
 
-        pretend_board.instance_variable_set(:@white_pieces, [white_pawn, white_king, white_knight, white_rook])
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             [white_pawn, "x", "x", "x", "x", "x", "x", "x"],
-                                             ["x", black_king, white_rook, "x", "x", "x", "x", "x"],
-                                             ["x", white_knight, "x", "x", "x", "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             ["x", "x", "x", white_king, "x", "x", "x", "x"],
-                                             %w[x x x x x x x x]])
-        valid_moves = pretend_board.taking_moves(black_king)
+        move_validator.board.instance_variable_set(:@white_pieces, [white_pawn, white_king, white_knight, white_rook])
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    [white_pawn, "x", "x", "x", "x", "x", "x", "x"],
+                                                    ["x", black_king, white_rook, "x", "x", "x", "x", "x"],
+                                                    ["x", white_knight, "x", "x", "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    ["x", "x", "x", white_king, "x", "x", "x", "x"],
+                                                    %w[x x x x x x x x]])
+        valid_moves = move_validator.taking_moves(black_king)
         expect(valid_moves).to contain_exactly([2, 2], [3, 1])
       end
     end
@@ -520,46 +521,46 @@ describe ValidateMoves do
       it "returns true when both pieces can en passant and there's empty space between them" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             [white_long_rook, "x", "x", "x", white_king, "x", "x", white_short_rook]])
-        expect(pretend_board.can_castle?("w", "0-0")).to be true
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    [white_long_rook, "x", "x", "x", white_king, "x", "x", white_short_rook]])
+        expect(move_validator.can_castle?("w", "0-0")).to be true
       end
 
       it "returns false when a piece is in-between them" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             [white_long_rook, "x", "x", "x", white_king, generic_piece, "x", white_short_rook]])
-        expect(pretend_board.can_castle?("w", "0-0")).to be false
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    [white_long_rook, "x", "x", "x", white_king, generic_piece, "x", white_short_rook]])
+        expect(move_validator.can_castle?("w", "0-0")).to be false
       end
 
       it "returns false when one of the pieces cannot en passant" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return false
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             [white_long_rook, "x", "x", "x", white_king, "x", "x", white_short_rook]])
-        expect(pretend_board.can_castle?("w", "0-0")).to be false
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    [white_long_rook, "x", "x", "x", white_king, "x", "x", white_short_rook]])
+        expect(move_validator.can_castle?("w", "0-0")).to be false
       end
     end
 
@@ -567,46 +568,46 @@ describe ValidateMoves do
       it "returns true when both pieces can en passant and there's empty space between them" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             [white_long_rook, "x", "x", "x", white_king, "x", "x", white_short_rook]])
-        expect(pretend_board.can_castle?("w", "0-0-0")).to be true
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    [white_long_rook, "x", "x", "x", white_king, "x", "x", white_short_rook]])
+        expect(move_validator.can_castle?("w", "0-0-0")).to be true
       end
 
       it "returns false when a piece is in the way" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             [white_long_rook, "x", generic_piece, "x", white_king, "x", "x", white_short_rook]])
-        expect(pretend_board.can_castle?("w", "0-0-0")).to be false
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    [white_long_rook, "x", generic_piece, "x", white_king, "x", "x", white_short_rook]])
+        expect(move_validator.can_castle?("w", "0-0-0")).to be false
       end
 
       it "returns false when one of the pieces cannot en passant" do
         allow(white_king).to receive(:can_castle).and_return false
         allow(white_short_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [%w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             [white_long_rook, "x", "x", "x", white_king, "x", "x", white_short_rook]])
-        expect(pretend_board.can_castle?("w", "0-0-0")).to be false
+        move_validator.board.instance_variable_set(:@board,
+                                                   [%w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    [white_long_rook, "x", "x", "x", white_king, "x", "x", white_short_rook]])
+        expect(move_validator.can_castle?("w", "0-0-0")).to be false
       end
     end
 
@@ -614,46 +615,46 @@ describe ValidateMoves do
       it "returns true when both pieces can en passant and there's empty space between them" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_short_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        expect(pretend_board.can_castle?("b", "0-0")).to be true
+        move_validator.board.instance_variable_set(:@board,
+                                                   [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        expect(move_validator.can_castle?("b", "0-0")).to be true
       end
 
       it "returns false when a piece is in the way" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_short_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [[black_long_rook, "x", "x", "x", black_king, "x", generic_piece, black_short_rook],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        expect(pretend_board.can_castle?("b", "0-0")).to be false
+        move_validator.board.instance_variable_set(:@board,
+                                                   [[black_long_rook, "x", "x", "x", black_king, "x", generic_piece, black_short_rook],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        expect(move_validator.can_castle?("b", "0-0")).to be false
       end
 
       it "returns false when one of the pieces cannot en passant" do
         allow(black_king).to receive(:can_castle).and_return false
         allow(black_short_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        expect(pretend_board.can_castle?("b", "0-0")).to be false
+        move_validator.board.instance_variable_set(:@board,
+                                                   [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        expect(move_validator.can_castle?("b", "0-0")).to be false
       end
     end
 
@@ -661,46 +662,46 @@ describe ValidateMoves do
       it "returns true when both pieces can en passant and there's empty space between them" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_long_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        expect(pretend_board.can_castle?("b", "0-0-0")).to be true
+        move_validator.board.instance_variable_set(:@board,
+                                                   [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        expect(move_validator.can_castle?("b", "0-0-0")).to be true
       end
 
       it "returns false when a piece is in the way" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_long_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [[black_long_rook, generic_piece, "x", "x", black_king, "x", "x", black_short_rook],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        expect(pretend_board.can_castle?("b", "0-0-0")).to be false
+        move_validator.board.instance_variable_set(:@board,
+                                                   [[black_long_rook, generic_piece, "x", "x", black_king, "x", "x", black_short_rook],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        expect(move_validator.can_castle?("b", "0-0-0")).to be false
       end
 
       it "returns false when one of the pieces cannot en passant" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_long_rook).to receive(:can_castle).and_return false
-        pretend_board.instance_variable_set(:@board,
-                                            [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        expect(pretend_board.can_castle?("b", "0-0-0")).to be false
+        move_validator.board.instance_variable_set(:@board,
+                                                   [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        expect(move_validator.can_castle?("b", "0-0-0")).to be false
       end
     end
 
@@ -708,16 +709,16 @@ describe ValidateMoves do
       it "returns false" do
         allow(black_king).to receive(:can_castle).and_return false
         allow(black_long_rook).to receive(:can_castle).and_return true
-        pretend_board.instance_variable_set(:@board,
-                                            [["x", "x", "x", "x", "x", "x", "x", black_short_rook],
-                                             ["x", "x", "x", "x", black_king, "x", "x", "x"],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x],
-                                             %w[x x x x x x x x]])
-        expect(pretend_board.can_castle?("b", "0-0")).to be false
+        move_validator.board.instance_variable_set(:@board,
+                                                   [["x", "x", "x", "x", "x", "x", "x", black_short_rook],
+                                                    ["x", "x", "x", "x", black_king, "x", "x", "x"],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x],
+                                                    %w[x x x x x x x x]])
+        expect(move_validator.can_castle?("b", "0-0")).to be false
       end
     end
   end

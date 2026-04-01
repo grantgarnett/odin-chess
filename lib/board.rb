@@ -4,8 +4,6 @@ require_relative "validate_moves"
 # This class is responsible for updating the state of the board
 # and answering questions about the board state
 class Board # rubocop: disable Metrics/ClassLength
-  include ValidateMoves
-
   attr_reader :board, :white_pieces, :black_pieces
 
   def initialize

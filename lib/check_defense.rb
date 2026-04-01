@@ -7,9 +7,7 @@ require_relative "validate_moves"
 #
 # this module needs access to taking
 # and non taking moves methods
-module CheckDefense
-  include ValidateMoves
-
+class CheckDefense < ValidateMoves
   def check_defense(color)
     king = find_king(color)
     enemy_team = color == "w" ? @black_pieces : @white_pieces
