@@ -14,17 +14,6 @@ class Board # rubocop: disable Metrics/ClassLength
     @black_pieces = generate_black_piece_arr
   end
 
-  def generate_board
-    @board = [generate_back_row("b"),
-              generate_pawns("b"),
-              %w[x x x x x x x x],
-              %w[x x x x x x x x],
-              %w[x x x x x x x x],
-              %w[x x x x x x x x],
-              generate_pawns("w"),
-              generate_back_row("w")]
-  end
-
   def move_piece(piece, target)
     update_attributes_after_move(piece, target)
 
@@ -47,6 +36,17 @@ class Board # rubocop: disable Metrics/ClassLength
   end
 
   private
+
+  def generate_board
+    @board = [generate_back_row("b"),
+              generate_pawns("b"),
+              %w[x x x x x x x x],
+              %w[x x x x x x x x],
+              %w[x x x x x x x x],
+              %w[x x x x x x x x],
+              generate_pawns("w"),
+              generate_back_row("w")]
+  end
 
   def generate_pawns(color)
     row = color == "w" ? 6 : 1
