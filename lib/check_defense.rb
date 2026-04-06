@@ -1,4 +1,5 @@
-require_relative "validate_moves"
+require_relative "taking_moves"
+require_relative "non_taking_moves"
 
 # this module returns valid moves for
 # a player to make when in check. this
@@ -7,10 +8,28 @@ require_relative "validate_moves"
 #
 # this module needs access to taking
 # and non taking moves methods
-class CheckDefense < ValidateMoves
+class CheckDefense
+  attr_reader :taking, :non_taking, :board
+
+  def initialize(taking_move_calculator, non_taking_move_calculator)
+    @taking = taking_move_calculator
+    @non_taking = non_taking_move_calculator
+    @board = @taking.board
+  end
+
+  def in_check?(color)
+    team = color == "w" ? @board.white_pieces : @board.black_pieces
+    king = team.find { |piece| piece.type == "K" }
+
+    enemy_team = color == "w" ? @board.black_pieces : @board.white_pieces
+    enemy_team.any? do |piece|
+      @taking.taking_moves(piece).include? king.position
+    end
+  end
+
   def check_defense(color)
-    king = find_king(color)
-    enemy_team = color == "w" ? @black_pieces : @white_pieces
+    king = @non_taking.find_king(color)
+    enemy_team = color == "w" ? @board.black_pieces : @board.white_pieces
     checking_pieces = find_checking_pieces(king, enemy_team)
 
     if checking_pieces.size > 1
@@ -24,7 +43,7 @@ class CheckDefense < ValidateMoves
 
   def find_checking_pieces(king, enemy_team)
     enemy_team.select do |piece|
-      taking_moves(piece).include? king.position
+      @taking.taking_moves(piece).include? king.position
     end
   end
 
@@ -38,10 +57,9 @@ class CheckDefense < ValidateMoves
     x_offset = convert_to_dir(king.position[0] - checking_piece.position[0])
     y_offset = convert_to_dir(king.position[1] - checking_piece.position[1])
 
-    non_taking_rec(
-      [checking_piece.position[0] + x_offset,
-       checking_piece.position[1] + y_offset], x_offset, y_offset
-    )
+    @non_taking.non_taking_rec([checking_piece.position[0] + x_offset,
+                                checking_piece.position[1] + y_offset],
+                               x_offset, y_offset)
   end
 
   private
@@ -53,8 +71,8 @@ class CheckDefense < ValidateMoves
   end
 
   def defending_king_moves(king)
-    convert_to_return_format(king, taking_moves(king))
-      .union(convert_to_return_format(king, non_taking_moves(king)))
+    convert_to_return_format(king, @taking.taking_moves(king))
+      .union(convert_to_return_format(king, @non_taking.non_taking_moves(king)))
   end
 
   def convert_to_return_format(piece, moves)
@@ -62,11 +80,11 @@ class CheckDefense < ValidateMoves
   end
 
   def defending_standard_taking_moves(checking_piece)
-    team = checking_piece.color == "w" ? @black_pieces : @white_pieces
+    team = checking_piece.color == "w" ? @board.black_pieces : @board.white_pieces
     checking_piece_pos = checking_piece.position
 
     team.map do |piece|
-      if taking_moves(piece).include? checking_piece_pos
+      if @taking.taking_moves(piece).include? checking_piece_pos
         [piece, checking_piece_pos]
       end
     end.compact
@@ -78,22 +96,22 @@ class CheckDefense < ValidateMoves
   def defense_by_en_passant(checking_piece)
     return [] unless checking_piece.type == "p" && checking_piece.can_en_passant
 
-    team = checking_piece.color == "w" ? @black_pieces : @white_pieces
+    team = checking_piece.color == "w" ? @board.black_pieces : @board.white_pieces
     pawns = team.select { |piece| piece.type == "p" }
 
     # since two could take
     pawns.map do |pawn|
-      move = en_passant_move(pawn.color, pawn.position)
+      move = @taking.en_passant_move(pawn.color, pawn.position)
       [pawn, move] unless move.empty?
     end
   end
 
   def blocking_moves(king, checking_piece)
     blocking_squares = find_blocking_squares(king, checking_piece)
-    team = king.color == "w" ? @white_pieces : @black_pieces
+    team = king.color == "w" ? @board.white_pieces : @board.black_pieces
 
     team.map do |piece|
-      moves = non_taking_moves(piece)
+      moves = @non_taking.non_taking_moves(piece)
 
       blocking_squares.map do |square|
         [piece, square] if moves.include? square
