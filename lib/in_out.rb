@@ -69,7 +69,7 @@ module InOut # rubocop: disable Metrics/ModuleLength
     print "test3\n"
   end
 
-  def stalemate_message
+  def draw_message
     print "test4\n"
   end
 

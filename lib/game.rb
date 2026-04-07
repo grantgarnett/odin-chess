@@ -12,7 +12,7 @@ class Game # rubocop: disable Metrics/ClassLength
 
   attr_reader :chess_board
 
-  def initialize
+  def initialize # rubocop: disable Metrics/MethodLength
     @chess_board = Board.new
     @current_player = Player.new("w")
     @other_player = Player.new("b")
@@ -21,20 +21,24 @@ class Game # rubocop: disable Metrics/ClassLength
     @non_taking = NonTakingMoves.new(@chess_board)
     @castling_validation = CastlingValidation.new(@chess_board)
     @check_defense = CheckDefense.new(@taking, @non_taking)
+
+    @last_white_game_state = nil
+    @second_last_white_game_state = nil
+    @last_black_game_state = nil
+    @second_last_black_game_state = nil
+    @white_modulo = 0
+    @black_modulo = 0
+    @white_counter_one = 0
+    @white_counter_two = 0
+    @black_counter_one = 0
+    @black_counter_two = 0
   end
 
   def play_game
     loop do
       print_board(@chess_board.game_state)
-
-      if @check_defense.in_check?(@current_player.color)
-        # returns 1 if the player is in checkmate
-        break if check_handling == 1
-      else
-        # returns 1 if the player is in stalemate
-        break if move_if_possible(take_move) == 1 # rubocop: disable Style/IfInsideElse
-      end
-
+      update_repetition_counter
+      process_current_turn
       switch_players
     end
   end
@@ -58,12 +62,23 @@ class Game # rubocop: disable Metrics/ClassLength
 
   private
 
-  def check_handling
+  def process_current_turn
+    if draw?
+      draw_message
+      exit
+    elsif @check_defense.in_check?(@current_player.color)
+      handle_check
+    else
+      move_if_possible(take_move)
+    end
+  end
+
+  def handle_check
     valid_moves = @check_defense.check_defense(@current_player.color)
 
     if valid_moves.empty?
       checkmate_message
-      1
+      exit
     else
       move_under_check(take_move, valid_moves)
     end
@@ -81,10 +96,7 @@ class Game # rubocop: disable Metrics/ClassLength
   end
 
   def move_if_possible(desired_move)
-    if stalemate?
-      stalemate_message
-      1
-    elsif %w[0-0 0-0-0].include? desired_move
+    if %w[0-0 0-0-0].include? desired_move
       castle_if_possible(desired_move)
     else
       standard_move_if_possible(desired_move)
@@ -154,6 +166,85 @@ class Game # rubocop: disable Metrics/ClassLength
 
     options
   end
+
+  def draw?
+    print "white counter one: #{@white_counter_one}\n"
+    print "white counter two: #{@white_counter_two}\n"
+    print "black counter one: #{@black_counter_one}\n"
+    print "black counter two: #{@black_counter_two}\n"
+    print "stalemate? #{stalemate?}\n"
+    @white_counter_one == 3 ||
+      @white_counter_two == 3 ||
+      @black_counter_one == 3 ||
+      @black_counter_two == 3 ||
+      @black_repetition_counter == 3 ||
+      stalemate?
+  end
+
+  def update_repetition_counter
+    if @current_player.color == "w"
+      update_white_repetition_counter
+    else
+      update_black_repetition_counter
+    end
+  end
+
+  def update_white_repetition_counter
+    if @white_modulo.zero?
+      update_white_counter_one
+    else
+      update_white_counter_two
+    end
+
+    @white_modulo = 1 - @white_modulo
+  end
+
+  def update_white_counter_one
+    if @second_last_white_game_state == @chess_board.game_state
+      @white_counter_one += 1
+    else
+      @white_counter_one = 0
+      @second_last_white_game_state = @chess_board.game_state
+    end
+  end
+
+  def update_white_counter_two
+    if @last_white_game_state == @chess_board.game_state
+      @white_counter_two += 1
+    else
+      @white_counter_two = 0
+      @last_white_game_state = @chess_board.game_state
+    end
+  end
+
+  def update_black_repetition_counter
+    if @black_modulo.zero?
+      update_black_counter_one
+    else
+      update_black_counter_two
+    end
+
+    @black_modulo = 1 - @black_modulo
+  end
+
+  def update_black_counter_one
+    if @second_last_black_game_state == @chess_board.game_state
+      @black_counter_one += 1
+    else
+      @black_counter_one = 0
+      @second_last_black_game_state = @chess_board.game_state
+    end
+  end
+
+  def update_black_counter_two
+    if @last_black_game_state == @chess_board.game_state
+      @black_counter_two += 1
+    else
+      @black_counter_two = 0
+      @last_black_game_state = @chess_board.game_state
+    end
+  end
 end
 
-Game.new
+game = Game.new
+game.play_game
