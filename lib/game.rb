@@ -115,6 +115,7 @@ class Game # rubocop: disable Metrics/ClassLength
 
   def standard_move_if_possible(desired_move)
     piece, move_pos = *find_piece_to_move(*desired_move)
+
     if piece.nil?
       invalid_input_message
       move_if_possible(take_move)
@@ -168,17 +169,27 @@ class Game # rubocop: disable Metrics/ClassLength
   end
 
   def draw?
+    draw_by_fifty_move_rule? ||
+      draw_by_threefold_repetition? ||
+      stalemate?
+  end
+
+  def draw_by_threefold_repetition?
     print "white counter one: #{@white_counter_one}\n"
     print "white counter two: #{@white_counter_two}\n"
     print "black counter one: #{@black_counter_one}\n"
     print "black counter two: #{@black_counter_two}\n"
     print "stalemate? #{stalemate?}\n"
+
     @white_counter_one == 3 ||
       @white_counter_two == 3 ||
       @black_counter_one == 3 ||
       @black_counter_two == 3 ||
-      @black_repetition_counter == 3 ||
-      stalemate?
+      @black_repetition_counter == 3
+  end
+
+  def draw_by_fifty_move_rule?
+    @chess_board.fifty_move_counter >= 50
   end
 
   def update_repetition_counter
@@ -204,7 +215,7 @@ class Game # rubocop: disable Metrics/ClassLength
       @white_counter_one += 1
     else
       @white_counter_one = 0
-      @second_last_white_game_state = @chess_board.game_state
+      @second_last_white_game_state = @chess_board.game_state.map(&:dup)
     end
   end
 
@@ -213,7 +224,7 @@ class Game # rubocop: disable Metrics/ClassLength
       @white_counter_two += 1
     else
       @white_counter_two = 0
-      @last_white_game_state = @chess_board.game_state
+      @last_white_game_state = @chess_board.game_state.map(&:dup)
     end
   end
 
@@ -232,7 +243,7 @@ class Game # rubocop: disable Metrics/ClassLength
       @black_counter_one += 1
     else
       @black_counter_one = 0
-      @second_last_black_game_state = @chess_board.game_state
+      @second_last_black_game_state = @chess_board.game_state.map(&:dup)
     end
   end
 
@@ -241,7 +252,7 @@ class Game # rubocop: disable Metrics/ClassLength
       @black_counter_two += 1
     else
       @black_counter_two = 0
-      @last_black_game_state = @chess_board.game_state
+      @last_black_game_state = @chess_board.game_state.map(&:dup)
     end
   end
 end

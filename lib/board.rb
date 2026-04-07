@@ -4,20 +4,25 @@ require_relative "validate_moves"
 # This class is responsible for updating the state of the board
 # and answering questions about the board state
 class Board # rubocop: disable Metrics/ClassLength
-  attr_reader :game_state, :white_pieces, :black_pieces
+  attr_reader :game_state, :white_pieces, :black_pieces, :fifty_move_counter
 
   def initialize
     @game_state = generate_board
     @white_pieces = generate_white_piece_arr
     @black_pieces = generate_black_piece_arr
+    @fifty_move_counter = 0
   end
 
   def move_piece(piece, target)
     update_attributes_after_move(piece, target)
 
+    # since en_passant uses the non_taking_move method
+    # to move the pawn, we cannot increment the fifty_move_counter
+    # in non_taking_move. This needs to be refactored at some point.
     if taking_by_en_passant?(piece, target)
       en_passant(piece, target)
     elsif game_state[target[0]][target[1]] == "x"
+      @fifty_move_counter = piece.type == "p" ? 0 : @fifty_move_counter + 1
       non_taking_move(piece, target)
     else
       taking_move(piece, target)
@@ -83,6 +88,7 @@ class Board # rubocop: disable Metrics/ClassLength
   end
 
   def en_passant(piece, target)
+    @fifty_move_counter = 0
     non_taking_move(piece, target)
     direction_of_removal = piece.color == "w" ? 1 : -1
     taken_piece = game_state[target[0] + direction_of_removal][target[1]]
@@ -100,14 +106,18 @@ class Board # rubocop: disable Metrics/ClassLength
   end
 
   def taking_move(piece, target)
-    taken_piece = game_state[target[0]][target[1]]
+    @fifty_move_counter = 0
+    remove_taken_piece(target)
 
     position_before = piece.position
     piece.position = target
 
     game_state[target[0]][target[1]] = piece
     game_state[position_before[0]][position_before[1]] = "x"
+  end
 
+  def remove_taken_piece(position)
+    taken_piece = game_state[position[0]][position[1]]
     remove_from_team_arr(taken_piece)
   end
 
