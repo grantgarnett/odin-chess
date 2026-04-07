@@ -7,8 +7,10 @@ require_relative "castling_validation"
 require_relative "check_defense"
 
 # description to be added
-class Game
+class Game # rubocop: disable Metrics/ClassLength
   include InOut
+
+  attr_reader :chess_board
 
   def initialize
     @chess_board = Board.new
@@ -19,7 +21,6 @@ class Game
     @non_taking = NonTakingMoves.new(@chess_board)
     @castling_validation = CastlingValidation.new(@chess_board)
     @check_defense = CheckDefense.new(@taking, @non_taking)
-    play_game
   end
 
   def play_game
@@ -27,19 +28,37 @@ class Game
       print_board(@chess_board.game_state)
 
       if @check_defense.in_check?(@current_player.color)
-        # if the return value is 1, the player is in checkmate
-        break if handle_check == 1
+        # returns 1 if the player is in checkmate
+        break if check_handling == 1
       else
-        move_if_possible(take_move)
+        # returns 1 if the player is in stalemate
+        break if move_if_possible(take_move) == 1 # rubocop: disable Style/IfInsideElse
       end
 
-      @current_player, @other_player = @other_player, @current_player
+      switch_players
     end
+  end
+
+  def stalemate?
+    team = current_team
+
+    if team.all? { |piece| %w[K p].include?(piece.type) }
+      return team.all? do |piece|
+        @taking.taking_moves(piece).empty? &&
+        @non_taking.non_taking_moves(piece).empty?
+      end
+    end
+
+    false
+  end
+
+  def switch_players
+    @current_player, @other_player = @other_player, @current_player
   end
 
   private
 
-  def handle_check
+  def check_handling
     valid_moves = @check_defense.check_defense(@current_player.color)
 
     if valid_moves.empty?
@@ -62,7 +81,10 @@ class Game
   end
 
   def move_if_possible(desired_move)
-    if %w[0-0 0-0-0].include? desired_move
+    if stalemate?
+      stalemate_message
+      1
+    elsif %w[0-0 0-0-0].include? desired_move
       castle_if_possible(desired_move)
     else
       standard_move_if_possible(desired_move)
