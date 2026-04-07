@@ -1,7 +1,7 @@
 # This module handles input / output for a game of chess
 # on the command line, such as prompting the user or
 # displaying the board.
-module InOut
+module InOut # rubocop: disable Metrics/ModuleLength
   def print_board(board)
     print_top
 
@@ -58,6 +58,15 @@ module InOut
   end
 
   def invalid_input_message
+    print "test1\n"
+  end
+
+  def invalid_input_under_check_message
+    print "test2\n"
+  end
+
+  def checkmate_message
+    print "test3\n"
   end
 
   private
