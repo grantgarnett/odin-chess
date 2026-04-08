@@ -56,4 +56,51 @@ describe DrawConditions do
       expect(draw_conditions.stalemate?("b")).to be false
     end
   end
+
+  context("draw_by_insufficient_material?") do
+    let(:white_king) { double("king", type: "K") }
+    let(:black_king) { double("king", type: "K") }
+    let(:bishop) { double("bishop", type: "B") }
+    let(:knight_one) { double("knight", type: "N") }
+    let(:knight_two) { double("knight", type: "N") }
+    let(:queen) { double("queen", type: "Q") }
+    let(:pawn) { double("pawn", type: "p") }
+
+    context("when each team has a king and one knight / bishop or less") do
+      before do
+        draw_conditions.board.instance_variable_set(:@white_pieces, [white_king, bishop])
+        draw_conditions.board.instance_variable_set(:@black_pieces, [black_king, knight_one])
+      end
+
+      it "returns true" do
+        expect(draw_conditions.draw_by_insufficient_material?).to be true
+      end
+    end
+
+    context("when one team has only a king and the other has a king and two knights") do
+      before do
+        draw_conditions.board.instance_variable_set(:@white_pieces, [white_king])
+        draw_conditions.board.instance_variable_set(:@black_pieces, [black_king, knight_one, knight_two])
+      end
+      it "returns true" do
+        expect(draw_conditions.draw_by_insufficient_material?).to be true
+      end
+    end
+
+    context("in any other case") do
+      it "returns false" do
+        draw_conditions.board.instance_variable_set(:@white_pieces, [white_king, bishop])
+        draw_conditions.board.instance_variable_set(:@black_pieces, [black_king, knight_one, knight_two])
+
+        expect(draw_conditions.draw_by_insufficient_material?).to be false
+      end
+
+      it "returns false again" do
+        draw_conditions.board.instance_variable_set(:@white_pieces, [white_king, pawn])
+        draw_conditions.board.instance_variable_set(:@black_pieces, [black_king])
+
+        expect(draw_conditions.draw_by_insufficient_material?).to be false
+      end
+    end
+  end
 end

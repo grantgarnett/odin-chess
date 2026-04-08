@@ -1,4 +1,4 @@
-class DrawConditions # rubocop disable Metrics/ClassLength
+class DrawConditions # rubocop: disable Metrics/ClassLength
   attr_reader :board
 
   def initialize(taking_calculator, non_taking_calculator) # rubocop: disable Metrics/MethodLength
@@ -23,15 +23,8 @@ class DrawConditions # rubocop disable Metrics/ClassLength
   def draw?(current_player_color)
     draw_by_fifty_move_rule? ||
       draw_by_threefold_repetition? ||
-      stalemate?(current_player_color)
-  end
-
-  def update_repetition_counter(current_player_color)
-    if current_player_color == "w"
-      update_white_repetition_counter
-    else
-      update_black_repetition_counter
-    end
+      stalemate?(current_player_color) ||
+      draw_by_insufficient_material?
   end
 
   def stalemate?(color)
@@ -45,6 +38,27 @@ class DrawConditions # rubocop disable Metrics/ClassLength
     end
 
     false
+  end
+
+  def update_repetition_counter(current_player_color)
+    if current_player_color == "w"
+      update_white_repetition_counter
+    else
+      update_black_repetition_counter
+    end
+  end
+
+  def increment_fifty_move_counter
+    @fifty_move_counter += 1
+  end
+
+  def reset_fifty_move_counter
+    @fifty_move_counter = 0
+  end
+
+  def draw_by_insufficient_material?
+    not_enough_pieces_to_mate? ||
+      two_knights_versus_sole_king?
   end
 
   private
@@ -117,11 +131,32 @@ class DrawConditions # rubocop disable Metrics/ClassLength
     end
   end
 
-  def increment_fifty_move_counter
-    @fifty_move_counter += 1
+  def not_enough_pieces_to_mate?
+    not_enough_white_pieces_to_mate? &&
+      not_enough_black_pieces_to_mate?
   end
 
-  def reset_fifty_move_counter
-    @fifty_move_counter = 0
+  def not_enough_white_pieces_to_mate?
+    @board.white_pieces.size <= 2 &&
+      @board.white_pieces.all? do |piece|
+        %w[N B K].include? piece.type
+      end
+  end
+
+  def not_enough_black_pieces_to_mate?
+    @board.black_pieces.size <= 2 &&
+      @board.black_pieces.all? do |piece|
+        %w[N B K].include? piece.type
+      end
+  end
+
+  def two_knights_versus_sole_king?
+    teams = [@board.white_pieces, @board.black_pieces]
+
+    teams.any? { |team| team.size == 1 } &&
+      teams.any? do |team|
+        team.size == 3 &&
+          team.count { |piece| piece.type == "N" } == 2
+      end
   end
 end
