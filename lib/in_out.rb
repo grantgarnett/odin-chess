@@ -58,19 +58,19 @@ module InOut # rubocop: disable Metrics/ModuleLength
   end
 
   def invalid_input_message
-    print "test1\n"
+    print "Oops, try again!\n\n"
   end
 
   def invalid_input_under_check_message
-    print "test2\n"
+    print "You're under check!\n\n"
   end
 
   def checkmate_message
-    print "test3\n"
+    print "\n\n\t\tCHECKMATE\n\n"
   end
 
   def draw_message
-    print "test4\n"
+    print "\n\n\t\tDRAW\n\n"
   end
 
   private
