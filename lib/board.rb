@@ -10,7 +10,6 @@ class Board # rubocop: disable Metrics/ClassLength
     @game_state = generate_board
     @white_pieces = generate_white_piece_arr
     @black_pieces = generate_black_piece_arr
-    @fifty_move_counter = 0
   end
 
   def move_piece(piece, target)
@@ -22,7 +21,6 @@ class Board # rubocop: disable Metrics/ClassLength
     if taking_by_en_passant?(piece, target)
       en_passant(piece, target)
     elsif game_state[target[0]][target[1]] == "x"
-      @fifty_move_counter = piece.type == "p" ? 0 : @fifty_move_counter + 1
       non_taking_move(piece, target)
     else
       taking_move(piece, target)
@@ -106,7 +104,6 @@ class Board # rubocop: disable Metrics/ClassLength
   end
 
   def taking_move(piece, target)
-    @fifty_move_counter = 0
     remove_taken_piece(target)
 
     position_before = piece.position

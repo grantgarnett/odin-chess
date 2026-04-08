@@ -1,4 +1,4 @@
-class DrawConditions
+class DrawConditions # rubocop disable Metrics/ClassLength
   attr_reader :board
 
   def initialize(taking_calculator, non_taking_calculator) # rubocop: disable Metrics/MethodLength
@@ -16,6 +16,8 @@ class DrawConditions
     @white_counter_two = 0
     @black_counter_one = 0
     @black_counter_two = 0
+
+    @fifty_move_counter = 0
   end
 
   def draw?(current_player_color)
@@ -56,7 +58,7 @@ class DrawConditions
   end
 
   def draw_by_fifty_move_rule?
-    @board.fifty_move_counter >= 50
+    @fifty_move_counter >= 50
   end
 
   def update_white_repetition_counter
@@ -113,5 +115,13 @@ class DrawConditions
       @black_counter_two = 0
       @last_black_game_state = @board.game_state.map(&:dup)
     end
+  end
+
+  def increment_fifty_move_counter
+    @fifty_move_counter += 1
+  end
+
+  def reset_fifty_move_counter
+    @fifty_move_counter = 0
   end
 end

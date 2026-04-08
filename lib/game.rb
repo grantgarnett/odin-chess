@@ -69,6 +69,7 @@ class Game # rubocop: disable Metrics/ClassLength
       invalid_input_under_check_message
       move_under_check(take_move, valid_moves)
     else
+      process_fifty_move_rule(desired_move[3], piece)
       @chess_board.move_piece(piece, move_pos)
     end
   end
@@ -145,4 +146,16 @@ class Game # rubocop: disable Metrics/ClassLength
 
     options
   end
+
+  def process_fifty_move_rule(taking, piece)
+    # if taking
+    if taking || piece.type == "p"
+      @draw_conditions.increment_fifty_move_counter
+    else
+      @draw_conditions.reset_fifty_move_counter
+    end
+  end
 end
+
+game = Game.new
+game.play_game
