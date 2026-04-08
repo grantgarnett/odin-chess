@@ -43,7 +43,7 @@ module InOut # rubocop: disable Metrics/ModuleLength
   end
 
   def convert_from_algebraic(move)
-    return if move.nil? || move.size == 1
+    return if move.size <= 1
 
     # this means a player can call a false check or
     # mate and we won't make them redo it. Will not
