@@ -5,6 +5,7 @@ require_relative "taking_moves"
 require_relative "non_taking_moves"
 require_relative "castling_validation"
 require_relative "check_defense"
+require_relative "draw_conditions"
 
 # description to be added
 class Game # rubocop: disable Metrics/ClassLength
@@ -12,7 +13,7 @@ class Game # rubocop: disable Metrics/ClassLength
 
   attr_reader :chess_board
 
-  def initialize # rubocop: disable Metrics/MethodLength
+  def initialize
     @chess_board = Board.new
     @current_player = Player.new("w")
     @other_player = Player.new("b")
@@ -21,39 +22,16 @@ class Game # rubocop: disable Metrics/ClassLength
     @non_taking = NonTakingMoves.new(@chess_board)
     @castling_validation = CastlingValidation.new(@chess_board)
     @check_defense = CheckDefense.new(@taking, @non_taking)
-
-    @last_white_game_state = nil
-    @second_last_white_game_state = nil
-    @last_black_game_state = nil
-    @second_last_black_game_state = nil
-    @white_modulo = 0
-    @black_modulo = 0
-    @white_counter_one = 0
-    @white_counter_two = 0
-    @black_counter_one = 0
-    @black_counter_two = 0
+    @draw_conditions = DrawConditions.new(@taking, @non_taking)
   end
 
   def play_game
     loop do
       print_board(@chess_board.game_state)
-      update_repetition_counter
+      @draw_conditions.update_repetition_counter(@current_player.color)
       process_current_turn
       switch_players
     end
-  end
-
-  def stalemate?
-    team = current_team
-
-    if team.all? { |piece| %w[K p].include?(piece.type) }
-      return team.all? do |piece|
-        @taking.taking_moves(piece).empty? &&
-        @non_taking.non_taking_moves(piece).empty?
-      end
-    end
-
-    false
   end
 
   def switch_players
@@ -63,7 +41,7 @@ class Game # rubocop: disable Metrics/ClassLength
   private
 
   def process_current_turn
-    if draw?
+    if @draw_conditions.draw?(@current_player.color)
       draw_message
       exit
     elsif @check_defense.in_check?(@current_player.color)
@@ -167,95 +145,4 @@ class Game # rubocop: disable Metrics/ClassLength
 
     options
   end
-
-  def draw?
-    draw_by_fifty_move_rule? ||
-      draw_by_threefold_repetition? ||
-      stalemate?
-  end
-
-  def draw_by_threefold_repetition?
-    print "white counter one: #{@white_counter_one}\n"
-    print "white counter two: #{@white_counter_two}\n"
-    print "black counter one: #{@black_counter_one}\n"
-    print "black counter two: #{@black_counter_two}\n"
-    print "stalemate? #{stalemate?}\n"
-
-    @white_counter_one == 3 ||
-      @white_counter_two == 3 ||
-      @black_counter_one == 3 ||
-      @black_counter_two == 3 ||
-      @black_repetition_counter == 3
-  end
-
-  def draw_by_fifty_move_rule?
-    @chess_board.fifty_move_counter >= 50
-  end
-
-  def update_repetition_counter
-    if @current_player.color == "w"
-      update_white_repetition_counter
-    else
-      update_black_repetition_counter
-    end
-  end
-
-  def update_white_repetition_counter
-    if @white_modulo.zero?
-      update_white_counter_one
-    else
-      update_white_counter_two
-    end
-
-    @white_modulo = 1 - @white_modulo
-  end
-
-  def update_white_counter_one
-    if @second_last_white_game_state == @chess_board.game_state
-      @white_counter_one += 1
-    else
-      @white_counter_one = 0
-      @second_last_white_game_state = @chess_board.game_state.map(&:dup)
-    end
-  end
-
-  def update_white_counter_two
-    if @last_white_game_state == @chess_board.game_state
-      @white_counter_two += 1
-    else
-      @white_counter_two = 0
-      @last_white_game_state = @chess_board.game_state.map(&:dup)
-    end
-  end
-
-  def update_black_repetition_counter
-    if @black_modulo.zero?
-      update_black_counter_one
-    else
-      update_black_counter_two
-    end
-
-    @black_modulo = 1 - @black_modulo
-  end
-
-  def update_black_counter_one
-    if @second_last_black_game_state == @chess_board.game_state
-      @black_counter_one += 1
-    else
-      @black_counter_one = 0
-      @second_last_black_game_state = @chess_board.game_state.map(&:dup)
-    end
-  end
-
-  def update_black_counter_two
-    if @last_black_game_state == @chess_board.game_state
-      @black_counter_two += 1
-    else
-      @black_counter_two = 0
-      @last_black_game_state = @chess_board.game_state.map(&:dup)
-    end
-  end
 end
-
-game = Game.new
-game.play_game
