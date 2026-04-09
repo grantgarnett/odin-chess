@@ -1,3 +1,5 @@
+# This class evaluates whether or not the
+# game is drawn
 class DrawConditions # rubocop: disable Metrics/ClassLength
   attr_reader :board
 

@@ -7,7 +7,9 @@ require_relative "castling_validation"
 require_relative "check_defense"
 require_relative "draw_conditions"
 
-# description to be added
+# This class is responsible for playing a game of
+# chess, interacting with various other classes and
+# objects in order to do so.
 class Game # rubocop: disable Metrics/ClassLength
   include InOut
 

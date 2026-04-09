@@ -1,5 +1,8 @@
 require_relative "validate_moves"
 
+# This class is responsible for for determining
+# whether a player of a particular color can
+# perform a castling operation given the board state
 class CastlingValidation < ValidateMoves
   def can_castle?(color, long_or_short)
     if long_or_short == "0-0"

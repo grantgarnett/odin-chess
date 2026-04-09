@@ -1,6 +1,8 @@
 require_relative "validate_moves"
 
-class TakingMoves < ValidateMoves
+# This class is responsible for evaluating taking
+# moves for a particular piece given the state of the board.
+class TakingMoves < ValidateMoves # rubocop: disable Metrics/ClassLength
   def taking_moves(piece) # rubocop: disable Metrics/AbcSize
     case piece.type
     when "p" then taking_pawn_moves(piece.color, piece.position)

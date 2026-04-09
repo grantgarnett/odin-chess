@@ -1,13 +1,9 @@
 require_relative "taking_moves"
 require_relative "non_taking_moves"
 
-# this module returns valid moves for
-# a player to make when in check. this
-# module assumes that a player is
-# in check.
-#
-# this module needs access to taking
-# and non taking moves methods
+# This class returns valid moves for
+# a player to make when in check. These
+# methods assume that a player is in check.
 class CheckDefense
   attr_reader :taking, :non_taking, :board
 

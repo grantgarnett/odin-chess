@@ -1,7 +1,7 @@
-# This class handles functionality for validating chess moves
-# Moves that involve taking are separated into their own
-# context, due to the use of algebraic notation in our
-# implementation of chess
+# This class hosts shared functionality for classes
+# which calculate possible moves for a piece, or
+# whether or not a desired move is possible given the
+# state of the board.
 class ValidateMoves
   attr_reader :board
 

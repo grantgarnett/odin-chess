@@ -1,6 +1,6 @@
 # This class records relevant information about a piece on a chess
-# board, such as its type, color, and information pertaining to special rules
-# (such as castling)
+# board, such as its type, color, and information pertaining
+# to special rules (such as castling)
 class Piece
   attr_accessor :position, :color
   attr_reader :type
