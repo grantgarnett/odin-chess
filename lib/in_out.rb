@@ -2,21 +2,8 @@
 # on the command line, such as prompting the user or
 # displaying the board.
 module InOut # rubocop: disable Metrics/ModuleLength
-  def print_board(board)
-    print_top
-
-    board.each_with_index do |row, row_index|
-      print_left_side_el(row_index)
-
-      row.each do |spot|
-        print spot == "x" ? "x " : piece_to_print(spot.color, spot.type)
-      end
-
-      print_right_side_el
-      print "\n"
-    end
-
-    print_bottom
+  def print_board(board, color)
+    color == "w" ? print_board_white(board) : print_board_black(board)
   end
 
   def piece_to_print(piece_color, piece_type)
@@ -75,12 +62,50 @@ module InOut # rubocop: disable Metrics/ModuleLength
 
   private
 
+  def print_board_white(board)
+    print_top
+
+    board.each_with_index do |row, row_index|
+      print_left_side_el(row_index)
+
+      row.each do |spot|
+        print spot == "x" ? "x " : piece_to_print(spot.color, spot.type)
+      end
+
+      print_right_side_el
+      print "\n"
+    end
+
+    print_bottom_white
+  end
+
+  def print_board_black(board)
+    print_top
+
+    board.to_enum.with_index.reverse_each do |row, row_index|
+      print_left_side_el(row_index)
+
+      row.reverse_each do |spot|
+        print spot == "x" ? "x " : piece_to_print(spot.color, spot.type)
+      end
+
+      print_right_side_el
+      print "\n"
+    end
+
+    print_bottom_black
+  end
+
   def print_top
     print "\n\n  - - - - - - - -\n"
   end
 
-  def print_bottom
+  def print_bottom_white
     print "  a b c d e f g h\n\n\n"
+  end
+
+  def print_bottom_black
+    print "  h g f e d c b a\n\n\n"
   end
 
   def print_left_side_el(row_index)

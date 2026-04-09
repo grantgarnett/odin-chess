@@ -27,7 +27,7 @@ class Game # rubocop: disable Metrics/ClassLength
 
   def play_game
     loop do
-      print_board(@chess_board.game_state)
+      print_board(@chess_board.game_state, @current_player.color)
       @draw_conditions.update_repetition_counter(@current_player.color)
       process_current_turn
       switch_players
