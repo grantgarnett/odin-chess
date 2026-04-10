@@ -29,6 +29,18 @@ module InOut # rubocop: disable Metrics/ModuleLength
     end
   end
 
+  def prompt_pawn_promotion
+    loop do
+      print "\n\n'Q', 'N', 'R', or 'B'? "
+      type = gets.chomp
+      print "\n"
+
+      return type if %w[Q N R B].include? type
+
+      print "Invalid input. Try again."
+    end
+  end
+
   def convert_from_algebraic(move)
     return if move.size <= 1
 
@@ -53,11 +65,11 @@ module InOut # rubocop: disable Metrics/ModuleLength
   end
 
   def checkmate_message
-    print "\n\n\t\tCHECKMATE\n\n"
+    print "\n\t\t\tCHECKMATE\n\n\n"
   end
 
   def draw_message
-    print "\n\n\t\tDRAW\n\n"
+    print "\n\t\t\tDRAW\n\n\n"
   end
 
   private

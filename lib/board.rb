@@ -1,9 +1,12 @@
 require_relative "piece"
 require_relative "validate_moves"
+require_relative "in_out"
 
 # This class is responsible for updating the state of the board
 # and answering questions about the board state
 class Board # rubocop: disable Metrics/ClassLength
+  include InOut
+
   attr_reader :game_state, :white_pieces, :black_pieces, :fifty_move_counter
 
   def initialize
@@ -15,9 +18,6 @@ class Board # rubocop: disable Metrics/ClassLength
   def move_piece(piece, target)
     update_attributes_after_move(piece, target)
 
-    # since en_passant uses the non_taking_move method
-    # to move the pawn, we cannot increment the fifty_move_counter
-    # in non_taking_move. This needs to be refactored at some point.
     if taking_by_en_passant?(piece, target)
       en_passant(piece, target)
     elsif game_state[target[0]][target[1]] == "x"
@@ -25,6 +25,8 @@ class Board # rubocop: disable Metrics/ClassLength
     else
       taking_move(piece, target)
     end
+
+    promote_pawn_if_possible(target) if piece.type == "p"
   end
 
   def castle(color, long_or_short)
@@ -85,16 +87,6 @@ class Board # rubocop: disable Metrics/ClassLength
     end.flatten.compact
   end
 
-  def en_passant(piece, target)
-    @fifty_move_counter = 0
-    non_taking_move(piece, target)
-    direction_of_removal = piece.color == "w" ? 1 : -1
-    taken_piece = game_state[target[0] + direction_of_removal][target[1]]
-
-    game_state[target[0] + direction_of_removal][target[1]] = "x"
-    remove_from_team_arr(taken_piece)
-  end
-
   def non_taking_move(piece, target)
     position_before = piece.position
     piece.position = target
@@ -111,6 +103,24 @@ class Board # rubocop: disable Metrics/ClassLength
 
     game_state[target[0]][target[1]] = piece
     game_state[position_before[0]][position_before[1]] = "x"
+  end
+
+  def promote_pawn_if_possible(pawn_pos)
+    promote_pawn if [0, 7].include? pawn_pos[0]
+  end
+
+  def promote_pawn(pawn_pos)
+    @game_state[pawn_pos[0]][pawn_pos[1]].type = prompt_pawn_promotion
+  end
+
+  def en_passant(piece, target)
+    @fifty_move_counter = 0
+    non_taking_move(piece, target)
+    direction_of_removal = piece.color == "w" ? 1 : -1
+    taken_piece = game_state[target[0] + direction_of_removal][target[1]]
+
+    game_state[target[0] + direction_of_removal][target[1]] = "x"
+    remove_from_team_arr(taken_piece)
   end
 
   def remove_taken_piece(position)

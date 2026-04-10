@@ -31,6 +31,7 @@ class Piece
     # current instance of this class
     singleton_class.class_eval { attr_accessor "move_by_two" }
     singleton_class.class_eval { attr_accessor "can_en_passant" }
+    singleton_class.class_eval { attr_writer "type" }
   end
 
   def construct_rook
