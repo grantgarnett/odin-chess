@@ -186,5 +186,29 @@ describe Board do
         expect(white_pawn).to have_received(:can_en_passant=).with(false)
       end
     end
+
+    context "when moving a pawn to one end of the board" do
+      let(:generic_pawn) { double("pawn", type: "p", color: "?", position: [1, 0], move_by_two: false) }
+
+      before do
+        allow(generic_pawn).to receive(:position=)
+        allow(board_test).to receive(:promote_pawn)
+        board_test.instance_variable_set(:@white_pieces, [generic_pawn])
+        board_test.instance_variable_set(:@board,
+                                         [%w[x x x x x x x x],
+                                          [generic_pawn, "x", "x", "x", "x", "x", "x", "x"],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x],
+                                          %w[x x x x x x x x]])
+        board_test.move_piece(generic_pawn, [0, 0])
+      end
+
+      it "promotes the pawn" do
+        expect(board_test).to have_received(:promote_pawn)
+      end
+    end
   end
 end

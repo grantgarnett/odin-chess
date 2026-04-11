@@ -106,7 +106,7 @@ class Board # rubocop: disable Metrics/ClassLength
   end
 
   def promote_pawn_if_possible(pawn_pos)
-    promote_pawn if [0, 7].include? pawn_pos[0]
+    promote_pawn(pawn_pos) if [0, 7].include? pawn_pos[0]
   end
 
   def promote_pawn(pawn_pos)
