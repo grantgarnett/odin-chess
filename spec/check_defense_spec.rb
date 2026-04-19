@@ -5,7 +5,7 @@ require_relative "../lib/board"
 
 describe CheckDefense do
   let(:board) { Board.new }
-  subject(:check_defense) { CheckDefense.new(TakingMoves.new(board), NonTakingMoves.new(board)) }
+  subject(:check_defense) { described_class.new(TakingMoves.new(board), NonTakingMoves.new(board)) }
 
   context("#check_defense") do
     before do
