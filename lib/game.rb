@@ -6,6 +6,7 @@ require_relative "non_taking_moves"
 require_relative "castling_validation"
 require_relative "check_defense"
 require_relative "draw_conditions"
+require_relative "pinned_piece"
 
 # This class is responsible for playing a game of
 # chess, interacting with various other classes and
@@ -25,6 +26,7 @@ class Game # rubocop: disable Metrics/ClassLength
     @castling_validation = CastlingValidation.new(@chess_board)
     @check_defense = CheckDefense.new(@taking, @non_taking)
     @draw_conditions = DrawConditions.new(@taking, @non_taking)
+    @pinned_pieces = PinnedPiece.new(@taking, @non_taking)
   end
 
   def play_game
@@ -125,16 +127,24 @@ class Game # rubocop: disable Metrics/ClassLength
     end
   end
 
-  def valid_pieces_for_move(possible_pieces, target_pos, taking)
+  def valid_pieces_for_move(possible_pieces, target_pos, taking) # rubocop: disable Metrics/MethodLength
     if taking == true
       possible_pieces.select do |piece|
-        @taking.taking_moves(piece).include? target_pos
+        @taking.taking_moves(piece).include?(target_pos) &&
+          can_make_move_if_pinned?(piece, target_pos)
       end
     else
       possible_pieces.select do |piece|
-        @non_taking.non_taking_moves(piece).include? target_pos
+        @non_taking.non_taking_moves(piece).include?(target_pos) &&
+          can_make_move_if_pinned?(piece, target_pos)
       end
     end
+  end
+
+  def can_make_move_if_pinned?(piece, target_pos)
+    return true unless @pinned_pieces.pinned_piece?(piece)
+
+    @pinned_pieces.valid_moves_under_pin(piece).include? target_pos
   end
 
   def filter_by_start_pos(options, start_pos)
@@ -158,6 +168,3 @@ class Game # rubocop: disable Metrics/ClassLength
     end
   end
 end
-
-game = Game.new
-game.play_game
