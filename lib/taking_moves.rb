@@ -2,6 +2,7 @@ require_relative "validate_moves"
 
 # This class is responsible for evaluating taking
 # moves for a particular piece given the state of the board.
+# This class does not evaluate whether or not a piece is pinned.
 class TakingMoves < ValidateMoves # rubocop: disable Metrics/ClassLength
   def taking_moves(piece) # rubocop: disable Metrics/AbcSize
     case piece.type
