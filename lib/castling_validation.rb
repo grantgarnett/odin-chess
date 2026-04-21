@@ -1,9 +1,9 @@
-require_relative "validate_moves"
+require_relative "non_taking_moves"
 
 # This class is responsible for for determining
 # whether a player of a particular color can
 # perform a castling operation given the board state
-class CastlingValidation < ValidateMoves
+class CastlingValidation < NonTakingMoves
   def can_castle?(color, long_or_short)
     if long_or_short == "0-0"
       can_short_castle?(color)
@@ -40,7 +40,8 @@ class CastlingValidation < ValidateMoves
 
     can_castle_at?(king_starting_pos, "K") &&
       can_castle_at?(rook_starting_pos, "R") &&
-      board.game_state[7][5] == "x" && board.game_state[7][6] == "x"
+      board.game_state[7][5] == "x" && board.game_state[7][6] == "x" &&
+      short_castle_not_blocked?([7, 5], [7, 6], @board.black_pieces)
   end
 
   def can_black_short_castle?
@@ -49,7 +50,8 @@ class CastlingValidation < ValidateMoves
 
     can_castle_at?(king_starting_pos, "K") &&
       can_castle_at?(rook_starting_pos, "R") &&
-      board.game_state[0][5] == "x" && board.game_state[0][6] == "x"
+      board.game_state[0][5] == "x" && board.game_state[0][6] == "x" &&
+      short_castle_not_blocked?([0, 5], [0, 6], @board.white_pieces)
   end
 
   def can_white_long_castle?
@@ -60,7 +62,8 @@ class CastlingValidation < ValidateMoves
       can_castle_at?(rook_starting_pos, "R") &&
       board.game_state[7][1] == "x" &&
       board.game_state[7][2] == "x" &&
-      board.game_state[7][3] == "x"
+      board.game_state[7][3] == "x" &&
+      long_castle_not_blocked?([7, 1], [7, 2], [7, 3], @board.black_pieces)
   end
 
   def can_black_long_castle?
@@ -71,6 +74,23 @@ class CastlingValidation < ValidateMoves
       can_castle_at?(rook_starting_pos, "R") &&
       board.game_state[0][1] == "x" &&
       board.game_state[0][2] == "x" &&
-      board.game_state[0][3] == "x"
+      board.game_state[0][3] == "x" &&
+      long_castle_not_blocked?([0, 1], [0, 2], [0, 3], @board.white_pieces)
+  end
+
+  def short_castle_not_blocked?(space_one, space_two, enemy_team)
+    enemy_team.none? do |piece|
+      moves = non_taking_moves(piece)
+      moves.include?(space_one) || moves.include?(space_two)
+    end
+  end
+
+  def long_castle_not_blocked?(space_one, space_two, space_three, enemy_team)
+    enemy_team.none? do |piece|
+      moves = non_taking_moves(piece)
+      moves.include?(space_one) ||
+        moves.include?(space_two) ||
+        moves.include?(space_three)
+    end
   end
 end
