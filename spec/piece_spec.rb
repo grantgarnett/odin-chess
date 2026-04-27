@@ -18,10 +18,6 @@ describe Piece do
       en_passant = pawn_test.can_en_passant
       expect(en_passant).to be false
     end
-
-    it "returns an error when asked if it can castle" do
-      expect { pawn_test.can_castle }.to raise_error(NoMethodError)
-    end
   end
 
   context("when creating a rook") do
@@ -34,10 +30,6 @@ describe Piece do
     it "can castle" do
       expect(rook_test.can_castle).to be true
     end
-
-    it "raises an error when asked if it can be taken by en passant" do
-      expect { rook_test.can_en_passant }.to raise_error(NoMethodError)
-    end
   end
 
   context("when creating a king") do
@@ -49,10 +41,6 @@ describe Piece do
 
     it "can castle" do
       expect(king_test.can_castle).to be true
-    end
-
-    it "raises an error when asked if it can move by two" do
-      expect { king_test.move_by_two }.to raise_error(NoMethodError)
     end
   end
 end

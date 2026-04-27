@@ -64,6 +64,7 @@ describe CastlingValidation do
       it "returns true when both pieces can en passant and there's empty space between them" do
         allow(white_king).to receive(:can_castle).and_return true
         allow(white_short_rook).to receive(:can_castle).and_return true
+        castling_validator.board.instance_variable_set(:@black_pieces, [])
         castling_validator.board.instance_variable_set(:@game_state,
                                                        [%w[x x x x x x x x],
                                                         %w[x x x x x x x x],
@@ -158,6 +159,7 @@ describe CastlingValidation do
       it "returns true when both pieces can en passant and there's empty space between them" do
         allow(black_king).to receive(:can_castle).and_return true
         allow(black_long_rook).to receive(:can_castle).and_return true
+        castling_validator.board.instance_variable_set(:@white_pieces, [])
         castling_validator.board.instance_variable_set(:@game_state,
                                                        [[black_long_rook, "x", "x", "x", black_king, "x", "x", black_short_rook],
                                                         %w[x x x x x x x x],
