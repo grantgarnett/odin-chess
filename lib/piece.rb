@@ -1,9 +1,13 @@
+require_relative "basic_serializable"
+
 # This class records relevant information about a piece on a chess
 # board, such as its type, color, and information pertaining
 # to special rules (such as castling)
 class Piece
-  attr_accessor :position, :color
-  attr_reader :type
+  include BasicSerializable
+
+  attr_accessor :position, :color, :move_by_two, :can_en_passant, :can_castle,
+                :type
 
   def initialize(color, type, position)
     @color = color
@@ -14,11 +18,8 @@ class Piece
   def construct_piece(type)
     @type = type
 
-    case type
-    when "p" then construct_pawn
-    when "R" then construct_rook
-    when "K" then construct_king
-    end
+    construct_pawn if type == "p"
+    construct_rook_or_king if %w[R K].include?(type)
   end
 
   private
@@ -26,23 +27,9 @@ class Piece
   def construct_pawn
     @move_by_two = true
     @can_en_passant = false
-
-    # creates an attribute accessor that is unique to the
-    # current instance of this class
-    singleton_class.class_eval { attr_accessor "move_by_two" }
-    singleton_class.class_eval { attr_accessor "can_en_passant" }
-    singleton_class.class_eval { attr_writer "type" }
   end
 
-  def construct_rook
+  def construct_rook_or_king
     @can_castle = true
-
-    singleton_class.class_eval { attr_accessor "can_castle" }
-  end
-
-  def construct_king
-    @can_castle = true
-
-    singleton_class.class_eval { attr_accessor "can_castle" }
   end
 end

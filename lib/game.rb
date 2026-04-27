@@ -14,9 +14,11 @@ require_relative "pinned_piece"
 class Game # rubocop: disable Metrics/ClassLength
   include InOut
 
+  attr_accessor :token
   attr_reader :chess_board
 
   def initialize
+    @token = nil
     @chess_board = Board.new
     @current_player = Player.new("w")
     @other_player = Player.new("b")
@@ -30,11 +32,13 @@ class Game # rubocop: disable Metrics/ClassLength
   end
 
   def play_game
-    loop do
-      print_board(@chess_board.game_state, @current_player.color)
-      @draw_conditions.update_repetition_counter(@current_player.color)
-      process_current_turn
-      switch_players
+    catch(:end) do
+      loop do
+        print_board(@chess_board.game_state, @current_player.color)
+        process_current_turn
+        @draw_conditions.update_repetition_counter(@current_player.color)
+        switch_players
+      end
     end
   end
 
@@ -42,12 +46,31 @@ class Game # rubocop: disable Metrics/ClassLength
     @current_player, @other_player = @other_player, @current_player
   end
 
+  def serialize
+    obj = [@draw_conditions, @chess_board,
+           @current_player, @other_player].map(&:serialize)
+    obj.push(@token)
+
+    JSON.dump(obj)
+  end
+
+  def unserialize(serialized_data)
+    obj = JSON.parse(serialized_data)
+
+    [@draw_conditions, @chess_board,
+     @current_player, @other_player].each_with_index do |instance_var, i|
+       instance_var.unserialize(obj[i])
+     end
+
+    @token = obj[4]
+  end
+
   private
 
   def process_current_turn
     if @draw_conditions.draw?(@current_player.color)
       draw_message
-      exit
+      throw(:end, 1)
     elsif @check_defense.in_check?(@current_player.color)
       handle_check
     else
@@ -60,13 +83,15 @@ class Game # rubocop: disable Metrics/ClassLength
 
     if valid_moves.empty?
       checkmate_message
-      exit
+      throw(:end, 1)
     else
       move_under_check(take_move, valid_moves)
     end
   end
 
   def move_under_check(desired_move, valid_moves)
+    throw(:end, 0) if desired_move == "!"
+
     piece, move_pos = *find_piece_to_move(*desired_move)
 
     if piece.nil? || !valid_moves.include?([piece, move_pos])
@@ -79,7 +104,9 @@ class Game # rubocop: disable Metrics/ClassLength
   end
 
   def move_if_possible(desired_move)
-    if %w[0-0 0-0-0].include? desired_move
+    if desired_move == "!"
+      throw(:end, 0)
+    elsif %w[0-0 0-0-0].include? desired_move
       castle_if_possible(desired_move)
     else
       standard_move_if_possible(desired_move)

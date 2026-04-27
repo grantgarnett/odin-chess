@@ -1,6 +1,10 @@
+require_relative "basic_serializable"
+
 # This class evaluates whether or not the
 # game is drawn
 class DrawConditions # rubocop: disable Metrics/ClassLength
+  include BasicSerializable
+
   attr_reader :board
 
   def initialize(taking_calculator, non_taking_calculator) # rubocop: disable Metrics/MethodLength
@@ -8,10 +12,10 @@ class DrawConditions # rubocop: disable Metrics/ClassLength
     @non_taking = non_taking_calculator
     @board = @taking.board
 
-    @last_white_game_state = nil
-    @second_last_white_game_state = nil
-    @last_black_game_state = nil
-    @second_last_black_game_state = nil
+    @last_white_game_state = " "
+    @second_last_white_game_state = " "
+    @last_black_game_state = " "
+    @second_last_black_game_state = " "
     @white_modulo = 0
     @black_modulo = 0
     @white_counter_one = 0
@@ -20,6 +24,12 @@ class DrawConditions # rubocop: disable Metrics/ClassLength
     @black_counter_two = 0
 
     @fifty_move_counter = 0
+
+    @serializable = [@last_white_game_state, @second_last_white_game_state,
+                     @last_black_game_state, @second_last_black_game_state,
+                     @white_modulo, @black_modulo, @white_counter_one,
+                     @white_counter_two, @black_counter_one,
+                     @black_counter_two, @fifty_move_counter]
   end
 
   def draw?(current_player_color)
@@ -61,6 +71,17 @@ class DrawConditions # rubocop: disable Metrics/ClassLength
   def draw_by_insufficient_material?
     not_enough_pieces_to_mate? ||
       two_knights_versus_sole_king?
+  end
+
+  def serialize
+    obj = {}
+
+    instance_variables.each do |var|
+      obj[var] = instance_variable_get(var) unless %i[@board @taking
+                                                      @non_taking].include? var
+    end
+
+    JSON.dump(obj)
   end
 
   private

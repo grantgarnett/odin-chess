@@ -38,6 +38,22 @@ class Board # rubocop: disable Metrics/ClassLength
     end
   end
 
+  def serialize
+    white_pieces = @white_pieces.map(&:serialize)
+    black_pieces = @black_pieces.map(&:serialize)
+
+    JSON.dump [white_pieces, black_pieces]
+  end
+
+  def unserialize(string)
+    # an array: [white_pieces, black_pieces]
+    pieces = JSON.parse(string)
+
+    unserialize_white_pieces(pieces)
+    unserialize_black_pieces(pieces)
+    unserialize_game_state
+  end
+
   private
 
   def generate_board
@@ -179,5 +195,42 @@ class Board # rubocop: disable Metrics/ClassLength
   def black_long_castle
     move_piece(game_state[0][0], [0, 3])
     move_piece(game_state[0][4], [0, 2])
+  end
+
+  def unserialize_white_pieces(pieces)
+    @white_pieces = []
+
+    pieces[0].each do |piece_string|
+      piece = Piece.new "", "", ""
+      piece.unserialize(piece_string)
+      @white_pieces << piece
+    end
+  end
+
+  def unserialize_black_pieces(pieces)
+    @black_pieces = []
+
+    pieces[1].each do |piece_string|
+      piece = Piece.new "", 0, ""
+      piece.unserialize(piece_string)
+      @black_pieces << piece
+    end
+  end
+
+  def unserialize_game_state
+    clear_board
+
+    [@white_pieces, @black_pieces].each do |team|
+      team.each do |piece|
+        pos = piece.position
+        @game_state[pos[0]][pos[1]] = piece
+      end
+    end
+  end
+
+  def clear_board
+    game_state.map! do |row|
+      row.map { "x" }
+    end
   end
 end
