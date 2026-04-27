@@ -42,14 +42,14 @@ module InOut # rubocop: disable Metrics/ModuleLength
   end
 
   def convert_from_algebraic(move)
-    return if move.size <= 1
+    return if move != "!" && move.size <= 1
 
     # this means a player can call a false check or
     # mate and we won't make them redo it. Will not
     # affect actual gameplay, however.
     move.slice!(-1, 1) if ["+", "#"].include?(move[-1])
 
-    if ["0-0", "0-0-0"].include?(move)
+    if ["0-0", "0-0-0", "!"].include?(move)
       move
     elsif valid_move_target?(move[-2, 2])
       convert_non_castling_move(move)
@@ -158,7 +158,8 @@ module InOut # rubocop: disable Metrics/ModuleLength
   end
 
   def print_valid_input
-    print "Please provide your input using algebraic notation. \n"
+    print "Please provide your input using algebraic notation. Enter '!' " \
+          "to save the game.\n"
     print "For more information, go to https://www.chess.com/terms/chess-notation\n\n"
   end
 
