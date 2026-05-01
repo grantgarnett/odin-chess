@@ -14,11 +14,12 @@ require_relative "pinned_piece"
 class Game # rubocop: disable Metrics/ClassLength
   include InOut
 
-  attr_accessor :token
+  attr_accessor :token, :computer
   attr_reader :chess_board
 
   def initialize
     @token = nil
+    @computer = nil
     @chess_board = Board.new
     @current_player = Player.new("w")
     @other_player = Player.new("b")
@@ -28,18 +29,10 @@ class Game # rubocop: disable Metrics/ClassLength
     @castling_validation = CastlingValidation.new(@chess_board)
     @check_defense = CheckDefense.new(@taking, @non_taking)
     @draw_conditions = DrawConditions.new(@taking, @non_taking)
-    @pinned_pieces = PinnedPiece.new(@taking, @non_taking)
   end
 
   def play_game
-    catch(:end) do
-      loop do
-        print_board(@chess_board.game_state, @current_player.color)
-        process_current_turn
-        @draw_conditions.update_repetition_counter(@current_player.color)
-        switch_players
-      end
-    end
+    computer ? play_computer : play_human
   end
 
   def switch_players
@@ -49,7 +42,7 @@ class Game # rubocop: disable Metrics/ClassLength
   def serialize
     obj = [@draw_conditions, @chess_board,
            @current_player, @other_player].map(&:serialize)
-    obj.push(@token)
+    obj.push(@token, @computer)
 
     JSON.dump(obj)
   end
@@ -63,11 +56,93 @@ class Game # rubocop: disable Metrics/ClassLength
      end
 
     @token = obj[4]
+    @computer = obj[5]
   end
 
   private
 
-  def process_current_turn
+  def play_computer
+    catch(:end) do
+      loop do
+        process_player_turn
+        process_computer_turn
+      end
+    end
+  end
+
+  def process_computer_turn
+    process_computer_move
+    @draw_conditions.update_repetition_counter(@current_player.color)
+    switch_players
+  end
+
+  def process_computer_move
+    if @draw_conditions.draw?(@current_player.color)
+      draw_message
+      throw(:end, 1)
+    elsif @check_defense.in_check?(@current_player.color)
+      computer_handle_check
+    else
+      computer_move
+    end
+  end
+
+  def computer_handle_check
+    valid_moves = @check_defense.check_defense(@current_player.color)
+
+    if valid_moves.empty?
+      throw(:end, 1)
+    else
+      move = valid_moves.sample
+      orig_enem_team_count = enemy_team.count
+      @chess_board.move_piece(move[0], move[1])
+      process_fifty_move_rule(orig_enem_team_count != enemy_team.count, move[0])
+    end
+  end
+
+  def computer_move
+    color = @current_player.color
+    valid_moves = generate_computer_moves(color)
+    move = valid_moves.sample
+
+    if %w[0-0 0-0-0].include? move
+      @chess_board.castle(color, move)
+    else
+      @chess_board.move_piece(move[0], move[1])
+    end
+  end
+
+  def generate_computer_moves(color)
+    team = current_team
+
+    moves = team.map do |piece|
+      @taking.taking_moves(piece).map { |move| [piece, move] }.union(
+        @non_taking.non_taking_moves(piece).map { |move| [piece, move] }
+      )
+    end.flatten(1).reject(&:empty?)
+
+    moves.push "0-0" if @castling_validation.can_short_castle?(color)
+    moves.push "0-0-0" if @castling_validation.can_long_castle?(color)
+
+    moves
+  end
+
+  def play_human
+    catch(:end) do
+      loop do
+        process_player_turn
+      end
+    end
+  end
+
+  def process_player_turn
+    print_board(@chess_board.game_state, @current_player.color)
+    process_player_move
+    @draw_conditions.update_repetition_counter(@current_player.color)
+    switch_players
+  end
+
+  def process_player_move
     if @draw_conditions.draw?(@current_player.color)
       draw_message
       throw(:end, 1)
@@ -151,6 +226,14 @@ class Game # rubocop: disable Metrics/ClassLength
       @chess_board.white_pieces
     else
       @chess_board.black_pieces
+    end
+  end
+
+  def enemy_team
+    if @current_player.color == "w"
+      @chess_board.black_pieces
+    else
+      @chess_board.white_pieces
     end
   end
 

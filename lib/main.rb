@@ -3,17 +3,33 @@ require_relative "game"
 $/ = "\n"
 
 def prompt_game
-  print "\nWould you like to play a new game, or load a previous one? \
-  ('N' or 'P')\n\n"
+  print "\nWould you like to play a new game, or load a previous one? " \
+        "('N' or 'P')\n\n"
   response = gets.chomp
 
   prompt_game unless %w[N P].include?(response)
 
   if response == "N"
-    Game.new
+    new_game_menu
   else
     previous_game_menu
   end
+end
+
+def new_game_menu
+  game = Game.new
+
+  print "\nWould you like to play against a human or computer? " \
+        "('H' or 'C')\n\n"
+  response = gets.chomp
+
+  new_game_menu unless %w[H C].include?(response)
+
+  game.computer = (response != "H")
+
+  print "game.computer: #{game.computer}\n\n"
+
+  game
 end
 
 def previous_game_menu
@@ -27,11 +43,11 @@ def previous_game_menu
     print "\nThere is no record of any saved games.\n"
     prompt_game
   else
-    choose_previous_game
+    choose_previous_game(count)
   end
 end
 
-def choose_previous_game
+def choose_previous_game(count)
   print "\nYou have #{count} saved games. Please select the number " \
         "of the game you would like to play ('1' would be the oldest).\n\n"
   response = gets.chomp.to_i
