@@ -29,6 +29,7 @@ class Game # rubocop: disable Metrics/ClassLength
     @castling_validation = CastlingValidation.new(@chess_board)
     @check_defense = CheckDefense.new(@taking, @non_taking)
     @draw_conditions = DrawConditions.new(@taking, @non_taking)
+    @pinned_pieces = PinnedPiece.new(@taking, @non_taking)
   end
 
   def play_game
@@ -116,9 +117,9 @@ class Game # rubocop: disable Metrics/ClassLength
     team = current_team
 
     moves = team.map do |piece|
-      @taking.taking_moves(piece).map { |move| [piece, move] }.union(
-        @non_taking.non_taking_moves(piece).map { |move| [piece, move] }
-      )
+      @pinned_pieces.valid_piece_moves_including_pins(piece).map do |move|
+        [piece, move]
+      end
     end.flatten(1).reject(&:empty?)
 
     moves.push "0-0" if @castling_validation.can_short_castle?(color)

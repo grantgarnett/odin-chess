@@ -6,7 +6,7 @@ require_relative "non_taking_moves"
 # for a piece that is (returning taking and non taking
 # moves along the direction of pin). This class does
 # not take into account the actual moveset of the piece.
-class PinnedPiece
+class PinnedPiece # rubocop: disable Metrics/ClassLength
   attr_reader :taking, :non_taking, :board
 
   DIAGONAL_PIN_DIRS = [[-1, -1], [-1, 1], [1, -1], [1, 1]].freeze
@@ -24,6 +24,16 @@ class PinnedPiece
 
     pinned_along_diagonal?(piece, king, enemy_color) ||
       pinned_along_flat_lines?(piece, king, enemy_color)
+  end
+
+  def valid_piece_moves_including_pins(piece)
+    piece_moves = @taking.taking_moves(piece).union(
+      @non_taking.non_taking_moves(piece)
+    )
+
+    return piece_moves unless pinned_piece?(piece)
+
+    piece_moves.intersection(valid_moves_under_pin(piece))
   end
 
   def valid_moves_under_pin(piece)

@@ -1,4 +1,5 @@
 require_relative "basic_serializable"
+require_relative "pinned_piece"
 
 # This class evaluates whether or not the
 # game is drawn
@@ -8,9 +9,8 @@ class DrawConditions # rubocop: disable Metrics/ClassLength
   attr_reader :board
 
   def initialize(taking_calculator, non_taking_calculator) # rubocop: disable Metrics/MethodLength
-    @taking = taking_calculator
-    @non_taking = non_taking_calculator
-    @board = @taking.board
+    @pin_calc = PinnedPiece.new(taking_calculator, non_taking_calculator)
+    @board = @pin_calc.board
 
     @last_white_game_state = " "
     @second_last_white_game_state = " "
@@ -44,8 +44,7 @@ class DrawConditions # rubocop: disable Metrics/ClassLength
 
     if team.all? { |piece| %w[K p].include?(piece.type) }
       return team.all? do |piece|
-        @taking.taking_moves(piece).empty? &&
-        @non_taking.non_taking_moves(piece).empty?
+        @pin_calc.valid_piece_moves_including_pins(piece).empty?
       end
     end
 
@@ -77,8 +76,8 @@ class DrawConditions # rubocop: disable Metrics/ClassLength
     obj = {}
 
     instance_variables.each do |var|
-      obj[var] = instance_variable_get(var) unless %i[@board @taking
-                                                      @non_taking].include? var
+      obj[var] = instance_variable_get(var) unless %i[@board
+                                                      @pin_calc].include? var
     end
 
     JSON.dump(obj)
