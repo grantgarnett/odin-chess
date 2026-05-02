@@ -26,10 +26,19 @@ def new_game_menu
   new_game_menu unless %w[H C].include?(response)
 
   game.computer = (response != "H")
-
-  print "game.computer: #{game.computer}\n\n"
+  play_as_white_or_black(game) if game.computer
 
   game
+end
+
+def play_as_white_or_black(game)
+  print "\nWould you like to play as white or black? ('W' or 'B')\n\n"
+
+  response = gets.chomp
+
+  play_as_white_or_black unless %w[W B].include?(response)
+
+  game.process_computer_turn if response == "B"
 end
 
 def previous_game_menu

@@ -60,6 +60,12 @@ class Game # rubocop: disable Metrics/ClassLength
     @computer = obj[5]
   end
 
+  def process_computer_turn
+    process_computer_move
+    @draw_conditions.update_repetition_counter(@current_player.color)
+    switch_players
+  end
+
   private
 
   def play_computer
@@ -69,12 +75,6 @@ class Game # rubocop: disable Metrics/ClassLength
         process_computer_turn
       end
     end
-  end
-
-  def process_computer_turn
-    process_computer_move
-    @draw_conditions.update_repetition_counter(@current_player.color)
-    switch_players
   end
 
   def process_computer_move
